@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CX Intelligence · Slice CC</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fafafa;--s0:#fff;--s1:#f4f5f7;--s2:#eef0f4;--s3:#e8eaee;
+  --bd:#dde1e8;--bd2:#c8cdd8;
+  --acc:#2563eb;--acc2:#1d4ed8;--accl:#eff4ff;--acct:#bfdbfe;
+  --red:#dc2626;--redl:#fef2f2;--redt:#fecaca;
+  --org:#ea580c;--orgl:#fff7ed;--orgt:#fed7aa;
+  --grn:#059669;--grnl:#ecfdf5;--grnt:#a7f3d0;
+  --pur:#7c3aed;--purl:#f5f3ff;--purt:#ddd6fe;
+  --yel:#d97706;--yell:#fffbeb;--yelt:#fde68a;
+  --sky:#0284c7;--skyl:#f0f9ff;--skyt:#bae6fd;
+  --pnk:#db2777;--pnkl:#fdf2f8;
+  --t1:#0f172a;--t2:#374151;--t3:#6b7280;--t4:#9ca3af;--t5:#d1d5db;
+}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:13px;background:var(--bg);color:var(--t1);line-height:1.5}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:4px}
+
+/* ── NAV ── */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:52px;background:var(--s0);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:300;box-shadow:0 1px 3px #0000000a}
+.ch-pill{font-family:'JetBrains Mono',monospace;font-size:10px;background:var(--accl);border:1px solid var(--acct);color:var(--acc);padding:3px 9px;border-radius:5px;font-weight:500}
+.nav-title{font-size:14px;font-weight:700;color:var(--t1)}
+.nav-sub{font-size:10px;color:var(--t3);margin-top:1px}
+.live{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--grn);font-weight:600;background:var(--grnl);padding:4px 10px;border-radius:20px;border:1px solid var(--grnt)}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--grn);animation:lp 2s infinite}
+@keyframes lp{0%,100%{box-shadow:0 0 0 0 #05966955}50%{box-shadow:0 0 0 5px transparent}}
+
+/* ── TIME BAR ── */
+.tbar{display:flex;align-items:center;gap:8px;padding:8px 24px;background:var(--s0);border-bottom:1px solid var(--bd);position:sticky;top:52px;z-index:299;flex-wrap:wrap}
+.tbl2{font-size:10px;color:var(--t3);font-weight:500}
+.tp{padding:4px 12px;border-radius:6px;border:1px solid var(--bd2);background:transparent;color:var(--t2);font-size:10px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s}
+.tp:hover{border-color:var(--acc);color:var(--acc);background:var(--accl)}
+.tp.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.tdiv{width:1px;height:16px;background:var(--bd)}
+.ts{font-size:10px;color:var(--t3)}.ts b{color:var(--t1);font-weight:600}
+.new-badge{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--red);background:var(--redl);border:1px solid var(--redt);padding:3px 8px;border-radius:20px}
+.exp-btn{margin-left:auto;padding:4px 12px;border-radius:6px;border:1px solid var(--bd2);background:var(--s0);color:var(--t2);font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;display:flex;align-items:center;gap:4px}
+.exp-btn:hover{border-color:var(--acc);color:var(--acc)}
+.refresh-btn{display:flex;align-items:center;gap:5px;padding:5px 14px;border-radius:6px;border:1px solid var(--acct);background:var(--accl);color:var(--acc);font-size:10px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.refresh-btn:hover{background:var(--acc);color:#fff;border-color:var(--acc)}
+.refresh-btn:disabled{opacity:.55;cursor:not-allowed;background:var(--s1);border-color:var(--bd);color:var(--t3)}
+.refresh-btn .spin{display:inline-block;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.last-refresh{font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace}
+.refresh-toast{position:fixed;bottom:24px;right:24px;z-index:999;padding:10px 16px;border-radius:8px;font-size:11px;font-weight:500;box-shadow:0 4px 16px #00000018;border:1px solid;animation:slideup .25s ease;display:none}
+@keyframes slideup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.toast-ok{background:var(--grnl);border-color:var(--grnt);color:var(--grn)}
+.toast-err{background:var(--redl);border-color:var(--redt);color:var(--red)}
+.toast-info{background:var(--accl);border-color:var(--acct);color:var(--acc)}
+
+/* ── TABS ── */
+.tabbar{display:flex;padding:0 24px;background:var(--s0);border-bottom:1px solid var(--bd);position:sticky;top:90px;z-index:298}
+.tab{padding:10px 16px;font-size:11px;font-weight:500;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tab:hover{color:var(--t2)}
+.tab.on{color:var(--acc);border-bottom-color:var(--acc);font-weight:600}
+
+/* ── PANE ── */
+.pane{display:none;padding:20px 24px;animation:fi .18s ease}
+.pane.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ── GRID ── */
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.g12{display:grid;grid-template-columns:1fr 1.7fr;gap:14px;margin-bottom:14px}
+.g21{display:grid;grid-template-columns:1.7fr 1fr;gap:14px}
+.g32{display:grid;grid-template-columns:1.8fr 1fr;gap:14px}
+.col{display:flex;flex-direction:column;gap:14px}
+
+/* ── CARD ── */
+.card{background:var(--s0);border:1px solid var(--bd);border-radius:10px;overflow:hidden;transition:box-shadow .2s}
+.card:hover{box-shadow:0 2px 8px #0000000d}
+.ch{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--bd);background:var(--s0)}
+.ct{font-size:11px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:6px}
+.cm{font-size:10px;color:var(--t3)}
+.cb{padding:12px 14px}
+
+/* ── KPI ── */
+.kpi{background:var(--s0);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;position:relative;overflow:hidden;cursor:pointer;transition:all .2s}
+.kpi:hover{box-shadow:0 4px 12px #00000012;transform:translateY(-1px)}
+.kpi-stripe{position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0}
+.kl{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:8px}
+.kv{font-size:26px;font-weight:800;letter-spacing:-.03em;line-height:1;margin-bottom:3px;color:var(--t1)}
+.ks{font-size:10px;color:var(--t3)}
+.kb{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:600;padding:2px 7px;border-radius:20px;margin-top:7px}
+
+/* ── TAG ── */
+.tag{display:inline-flex;align-items:center;font-size:9px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;padding:2px 6px;border-radius:4px;white-space:nowrap}
+
+/* ── BAR LIST ── */
+.blist{display:flex;flex-direction:column;gap:10px}
+.brow{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.blabel{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t1)}
+.bdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.bcount{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--t2);font-weight:500}
+.btrack{height:5px;background:var(--s2);border-radius:10px;overflow:hidden}
+.bfill{height:100%;border-radius:10px;width:0%;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.bi{cursor:pointer;padding:4px 6px;border-radius:6px;margin:-4px -6px;transition:background .1s}
+.bi:hover{background:var(--s1)}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse}
+.tbl thead th{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);padding:0 10px 9px;text-align:left;border-bottom:1px solid var(--bd)}
+.tbl tbody tr{cursor:pointer;transition:background .1s}
+.tbl tbody tr:hover td{background:var(--s1)}
+.tbl tbody td{padding:9px 10px;font-size:11px;color:var(--t2);border-bottom:1px solid var(--s2);vertical-align:middle}
+.tbl tbody tr:last-child td{border-bottom:none}
+.tdm{color:var(--t1);font-size:11px;font-weight:500}
+.tdmo{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t3)}
+
+/* ── FEED ── */
+.feed{display:flex;flex-direction:column}
+.fi2{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--s2);cursor:pointer;transition:background .1s}
+.fi2:hover{background:var(--s1)}
+.fi2:last-child{border-bottom:none}
+.fav{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.fn{font-size:10px;font-weight:600;color:var(--t1)}
+.ft2{font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace}
+.ftxt{font-size:11px;color:var(--t2);line-height:1.5;margin-top:2px}
+.fdl{font-size:9px;color:var(--acc);text-decoration:none;font-family:'JetBrains Mono',monospace;padding:1px 6px;background:var(--accl);border:1px solid var(--acct);border-radius:4px;transition:all .15s;font-weight:500}
+.fdl:hover{background:var(--acc);color:#fff}
+
+/* ── FILTER BAR ── */
+.fbar{display:flex;gap:6px;padding:8px 14px;border-bottom:1px solid var(--bd);background:var(--s1);flex-wrap:wrap;align-items:center}
+.fp{padding:3px 10px;border-radius:6px;border:1px solid var(--bd2);background:var(--s0);color:var(--t2);font-size:10px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;font-weight:500}
+.fp:hover{border-color:var(--acc);color:var(--acc)}
+.fp.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.fsr{flex:1;min-width:140px;background:var(--s0);border:1px solid var(--bd);border-radius:6px;padding:5px 10px;color:var(--t1);font-size:10px;font-family:'Inter',sans-serif;outline:none;transition:border-color .15s}
+.fsr::placeholder{color:var(--t4)}
+.fsr:focus{border-color:var(--acc);box-shadow:0 0 0 3px #2563eb14}
+
+/* ── ALERT ── */
+.alert{display:flex;gap:10px;padding:10px 12px;border-radius:8px;margin-bottom:8px;border:1px solid;cursor:pointer;transition:all .15s}
+.alert:hover{transform:translateX(2px);box-shadow:0 2px 8px #00000010}
+.alert:last-child{margin-bottom:0}
+.al-r{background:var(--redl);border-color:var(--redt)}
+.al-o{background:var(--orgl);border-color:var(--orgt)}
+.al-b{background:var(--skyl);border-color:var(--skyt)}
+.al-p{background:var(--purl);border-color:var(--purt)}
+.alert-ico{font-size:15px;flex-shrink:0;line-height:1.4}
+.alert-t{font-size:10px;font-weight:600;color:var(--t1);margin-bottom:2px}
+.alert-b{font-size:9px;color:var(--t2);line-height:1.5}
+
+/* ── SROW ── */
+.srow{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--s2);cursor:pointer;transition:background .1s;border-radius:4px;padding-left:4px;padding-right:4px}
+.srow:hover{background:var(--s1)}
+.srow:last-child{border-bottom:none}
+.sk{font-size:10px;color:var(--t2)}
+.sv2{font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace}
+
+/* ── INSIGHT CALLOUT ── */
+.callout{padding:9px 12px;border-radius:8px;border-left:3px solid;font-size:10px;color:var(--t2);line-height:1.6;margin-top:10px}
+.callout b{color:var(--t1)}
+.ca-r{background:var(--redl);border-left-color:var(--red)}
+.ca-o{background:var(--orgl);border-left-color:var(--org)}
+.ca-g{background:var(--grnl);border-left-color:var(--grn)}
+.ca-a{background:var(--accl);border-left-color:var(--acc)}
+.ca-p{background:var(--purl);border-left-color:var(--pur)}
+
+/* ── HV CARD ── */
+.hvc{display:flex;align-items:center;gap:10px;padding:8px 11px;background:var(--s1);border-radius:8px;margin-bottom:7px;border-left:3px solid;cursor:pointer;transition:all .15s;border:1px solid var(--bd)}
+.hvc:hover{background:var(--s2);box-shadow:0 2px 6px #00000010}
+.hvc:last-child{margin-bottom:0}
+.hvc-l{border-left:3px solid transparent}
+.hvamt{min-width:78px;font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace}
+
+/* ── DONUT ── */
+.dwrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+.dinn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.dp2{font-size:20px;font-weight:800}
+.dl2{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+.leg{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.li{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t2)}
+.ld{width:7px;height:7px;border-radius:50%}
+
+/* ── TOOLTIP ── */
+.tip{position:fixed;background:var(--t1);border-radius:6px;padding:6px 10px;font-size:10px;color:#fff;pointer-events:none;z-index:999;display:none;max-width:200px;line-height:1.5;box-shadow:0 4px 16px #00000030}
+
+/* ── MODAL ── */
+.mbal{position:fixed;inset:0;background:#00000066;z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.mbal.open{display:flex}
+.modal{background:var(--s0);border:1px solid var(--bd);border-radius:12px;width:min(560px,92vw);max-height:85vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px #00000022}
+.mhead{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid var(--bd)}
+.mtitle{font-size:13px;font-weight:700;color:var(--t1);line-height:1.4;flex:1;padding-right:12px}
+.mx{background:none;border:1px solid var(--bd);color:var(--t3);cursor:pointer;font-size:14px;line-height:1;padding:4px 8px;border-radius:6px;flex-shrink:0;transition:all .15s}
+.mx:hover{background:var(--s2);color:var(--t1)}
+.mbody{overflow-y:auto;padding:16px 20px;flex:1;display:flex;flex-direction:column;gap:14px}
+.mfl2{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);display:block;margin-bottom:5px;font-weight:600}
+.mfv{font-size:11px;color:var(--t2);line-height:1.7;background:var(--s1);padding:10px 12px;border-radius:8px;border:1px solid var(--bd)}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mgi .mgl{font-size:9px;color:var(--t3);margin-bottom:2px}
+.mgi .mgv{font-size:11px;color:var(--t1);font-weight:500}
+.fdbtn{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--acc);text-decoration:none;padding:7px 14px;background:var(--accl);border:1px solid var(--acct);border-radius:7px;transition:all .15s;font-family:'Inter',sans-serif;font-weight:500}
+.fdbtn:hover{background:var(--acc);color:#fff}
+
+/* ── CHART ── */
+svg.chart{overflow:visible;display:block;width:100%}
+.ax{font-family:'JetBrains Mono',monospace;fill:var(--t4);font-size:9px}
+.gl{stroke:var(--s2);stroke-width:1}
+
+/* ── REC ── */
+.rec{display:flex;gap:10px;padding:11px 13px;background:var(--s0);border-radius:8px;border:1px solid var(--bd);border-left:3px solid;margin-bottom:10px;cursor:pointer;transition:all .15s}
+.rec:hover{background:var(--s1);box-shadow:0 2px 6px #00000010}
+.rec:last-child{margin-bottom:0}
+.rtitle{font-size:11px;font-weight:600;color:var(--t1);display:flex;align-items:center;gap:6px}
+.rbody{font-size:10px;color:var(--t2);line-height:1.6;margin-top:6px;display:none}
+.rbody.open{display:block}
+
+/* ── INSIGHT CARD ── */
+.ins-card{background:var(--s0);border:1px solid var(--bd);border-radius:8px;padding:12px 14px;margin-bottom:10px;transition:box-shadow .15s}
+.ins-card:hover{box-shadow:0 2px 8px #0000000d}
+.ins-card:last-child{margin-bottom:0}
+.ins-title{font-size:11px;font-weight:600;color:var(--t1);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.ins-body{font-size:10px;color:var(--t2);line-height:1.6}
+.ins-metric{font-size:18px;font-weight:800;margin-bottom:2px}
+.ins-label{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em}
+
+/* ── TREND TABLE ── */
+.tt{width:100%;border-collapse:collapse;font-size:11px}
+.tt thead th{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);padding:8px 12px;text-align:right;border-bottom:2px solid var(--bd);white-space:nowrap;background:var(--s1)}
+.tt thead th:first-child{text-align:left;min-width:130px}
+.tt thead th:last-child{text-align:left}
+.tt tbody tr{transition:background .1s;cursor:default}
+.tt tbody tr:hover td{background:var(--s1)}
+.tt tbody td{padding:9px 12px;border-bottom:1px solid var(--s2);vertical-align:middle;text-align:right}
+.tt tbody td:first-child{text-align:left;font-weight:600;color:var(--t1)}
+.tt tbody td:last-child{text-align:left}
+.tt tbody tr:last-child td{border-bottom:none}
+.tt-total-row td{background:var(--s1)!important;font-weight:700;border-top:2px solid var(--bd);color:var(--t1)}
+.tt-val{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;display:inline-block;min-width:22px;text-align:center;padding:2px 6px;border-radius:4px}
+.tt-val.zero{color:var(--t4)}
+.tt-delta{font-size:10px;font-weight:700;padding:2px 5px;border-radius:4px;white-space:nowrap;display:inline-flex;align-items:center;gap:2px}
+.tt-delta.up{background:#fef2f2;color:#dc2626}
+.tt-delta.dn{background:#ecfdf5;color:#059669}
+.tt-delta.st{background:var(--s2);color:var(--t3)}
+.tt-spark{display:flex;align-items:flex-end;gap:2px;height:22px;width:60px}
+.tt-spark-bar{border-radius:2px 2px 0 0;flex:1;min-height:2px;transition:opacity .15s}
+.tt-spark-bar:hover{opacity:.7}
+.tt-cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block;margin-right:6px;vertical-align:middle}
+/* ── END TREND TABLE ── */
+.trend-sparkline{display:flex;align-items:flex-end;gap:2px;height:28px;margin-top:8px}
+.ts-bar{border-radius:2px 2px 0 0;flex:1;min-width:4px;transition:opacity .15s;cursor:pointer}
+.ts-bar:hover{opacity:.7}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:32px;color:var(--t3);font-size:11px}
+
+/* ── UX WIN ── */
+.uxw{display:flex;gap:9px;padding:9px 0;border-bottom:1px solid var(--s2)}
+.uxw:last-child{border-bottom:none}
+</style>
+</head>
+<body>
+<div class="tip" id="tip"></div>
+
+<!-- NAV -->
+<div class="nav">
+  <div style="display:flex;align-items:center;gap:10px">
+    <span class="ch-pill">#cc-launch-cx</span>
+    <div>
+      <div class="nav-title">CX Intelligence · Slice Credit Card</div>
+      <div class="nav-sub">Real escalations from Slack · Jun 6 – Jun 30, 2026</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="new-badge">🟢 +10 new · Last refresh: Jul 1, 11:50 IST</div>
+    <span class="last-refresh" id="last-refresh-lbl">Refreshed just now</span>
+    <button class="refresh-btn" id="refresh-btn" onclick="doRefresh()">
+      <span id="refresh-icon">↻</span> Refresh
+    </button>
+    <div class="live"><div class="live-dot"></div>Live</div>
+  </div>
+</div>
+
+<!-- TIME BAR -->
+<div class="tbar">
+  <span class="tbl2">Period:</span>
+  <button class="tp" id="btn-7d" onclick="setRange('7d')">Last 7D</button>
+  <button class="tp" id="btn-14d" onclick="setRange('14d')">Last 14D</button>
+  <button class="tp on" id="btn-all" onclick="setRange('all')">All time</button>
+  <div class="tdiv"></div>
+  <span class="ts">Range: <b id="lbl-range">Jun 6 – Jun 30</b></span>
+  <span class="ts">Total: <b id="lbl-total">—</b></span>
+  <span class="ts">Avg/day: <b id="lbl-avg">—</b></span>
+  <div id="cfb" style="display:none;align-items:center;gap:6px">
+    <div class="tdiv"></div>
+    <span style="font-size:10px;font-weight:600;color:var(--org)" id="cfl"></span>
+    <button onclick="clrCF()" style="font-size:9px;background:var(--orgl);border:1px solid var(--orgt);color:var(--org);border-radius:4px;padding:2px 6px;cursor:pointer;font-family:'Inter',sans-serif">✕ Clear</button>
+  </div>
+  <button class="exp-btn" onclick="exportCSV()">↓ Export CSV</button>
+</div>
+
+<!-- TABS -->
+<div class="tabbar">
+  <div class="tab on" id="tab-overview" onclick="sw('overview')">📊 Overview</div>
+  <div class="tab" id="tab-insights" onclick="sw('insights')">💡 Insights</div>
+  <div class="tab" id="tab-issues" onclick="sw('issues')">🔥 Issues</div>
+  <div class="tab" id="tab-trends" onclick="sw('trends')">📈 Trends</div>
+  <div class="tab" id="tab-feed" onclick="sw('feed')">📋 Feed</div>
+  <div class="tab" id="tab-actions" onclick="sw('actions')">🎯 Actions</div>
+</div>
+
+<!-- ═══ OVERVIEW ═══ -->
+<div class="pane on" id="pane-overview">
+  <div class="g5" id="kpi-row"></div>
+  <div class="g12">
+    <div class="card" style="margin-bottom:0">
+      <div class="ch"><span class="ct">📂 Issue Categories</span><span class="cm" id="ctl">click bar to filter</span></div>
+      <div class="cb"><div class="blist" id="cat-bars"></div></div>
+    </div>
+    <div class="col">
+      <div class="card" style="margin-bottom:0">
+        <div class="ch"><span class="ct">⚡ Critical Alerts</span><span class="cm">Click to view ticket</span></div>
+        <div class="cb" id="alert-list"></div>
+      </div>
+      <div class="g2" style="margin-bottom:0">
+        <div class="card" style="margin-bottom:0">
+          <div class="ch"><span class="ct">Sentiment</span></div>
+          <div class="cb">
+            <div class="dwrap">
+              <div style="position:relative">
+                <svg width="106" height="106" viewBox="0 0 106 106">
+                  <circle cx="53" cy="53" r="38" fill="none" stroke="#f1f5f9" stroke-width="11"/>
+                  <circle cx="53" cy="53" r="38" fill="none" stroke="#dc2626" stroke-width="11" stroke-dasharray="170.9 238.8" stroke-dashoffset="0" transform="rotate(-90 53 53)"/>
+                  <circle cx="53" cy="53" r="38" fill="none" stroke="#9ca3af" stroke-width="11" stroke-dasharray="47.8 361.9" stroke-dashoffset="-170.9" transform="rotate(-90 53 53)"/>
+                  <circle cx="53" cy="53" r="38" fill="none" stroke="#059669" stroke-width="11" stroke-dasharray="19.1 390.6" stroke-dashoffset="-218.7" transform="rotate(-90 53 53)"/>
+                </svg>
+                <div class="dinn"><div class="dp2" style="color:var(--red)">72%</div><div class="dl2">negative</div></div>
+              </div>
+              <div class="leg">
+                <div class="li"><div class="ld" style="background:var(--red)"></div>Neg 72%</div>
+                <div class="li"><div class="ld" style="background:var(--t4)"></div>Neu 20%</div>
+                <div class="li"><div class="ld" style="background:var(--grn)"></div>Pos 8%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <div class="ch"><span class="ct">7-Day Volume</span></div>
+          <div class="cb" style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:flex-end;gap:3px;height:38px" id="spark"></div>
+            <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace" id="sparkl"></div>
+            <div style="font-size:9px;color:var(--t3)" id="sparkn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ INSIGHTS ═══ -->
+<div class="pane" id="pane-insights">
+  <!-- Insight KPIs -->
+  <div class="g4" id="ins-kpis"></div>
+  <div class="g2">
+    <!-- Category trend -->
+    <div class="card" style="margin-bottom:0">
+      <div class="ch"><span class="ct">📈 Category Monthly Trend</span><span class="cm">Jun volume by week — is it getting worse?</span></div>
+      <div class="cb" id="cat-trend-chart"></div>
+    </div>
+    <!-- Pattern analysis -->
+    <div class="card" style="margin-bottom:0">
+      <div class="ch"><span class="ct">🔍 Pattern Analysis</span><span class="cm">What's accelerating</span></div>
+      <div class="cb" id="pattern-list"></div>
+    </div>
+  </div>
+  <!-- Monthly Trend Table -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="ch">
+      <span class="ct">📊 Monthly Issue Trend — All Categories</span>
+      <span class="cm">Week-by-week breakdown · ↑ = increasing · ↓ = improving · → = stable</span>
+    </div>
+    <div id="trend-table-wrap"></div>
+  </div>
+
+  <div class="g3">
+    <div class="card" style="margin-bottom:0">
+      <div class="ch"><span class="ct">⏱ Resolution Risk</span><span class="cm">Unresolved high-value</span></div>
+      <div class="cb" id="res-risk"></div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="ch"><span class="ct">🚨 RBI Exposure</span><span class="cm">Regulatory escalation risk</span></div>
+      <div class="cb" id="rbi-risk"></div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="ch"><span class="ct">📣 Viral Risk</span><span class="cm">Social media exposure</span></div>
+      <div class="cb" id="viral-risk"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ISSUES ═══ -->
+<div class="pane" id="pane-issues">
+  <div class="g21">
+    <div class="card" style="margin-bottom:0;min-width:0">
+      <div class="ch"><span class="ct" id="issues-title">🔥 All Issues</span><span class="cm">Click row for full detail</span></div>
+      <div class="fbar">
+        <input class="fsr" id="isr" placeholder="Search title, category, ticket #…" oninput="renderIT()">
+        <button class="fp on" id="sf-all" onclick="setSev('all')">All</button>
+        <button class="fp" id="sf-critical" onclick="setSev('critical')">🔴 Critical</button>
+        <button class="fp" id="sf-high" onclick="setSev('high')">🟠 High</button>
+        <button class="fp" id="sf-medium" onclick="setSev('medium')">🔵 Medium</button>
+        <button id="ccf" onclick="clrCat()" style="display:none;font-size:9px;color:var(--org);background:var(--orgl);border:1px solid var(--orgt);border-radius:5px;padding:2px 8px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500"></button>
+      </div>
+      <div style="max-height:calc(100vh - 300px);overflow-y:auto">
+        <table class="tbl"><thead><tr><th>#</th><th>Issue</th><th>Category</th><th>Sev</th><th style="text-align:right">Date</th></tr></thead>
+        <tbody id="itbody"></tbody></table>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card" style="margin-bottom:0">
+        <div class="ch"><span class="ct">💰 High-Value Cases</span><span class="cm">Click to open</span></div>
+        <div class="cb" id="hvc-list"></div>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div class="ch"><span class="ct">📋 Onboarding Breakdown</span></div>
+        <div class="cb" id="onb-detail"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TRENDS ═══ -->
+<div class="pane" id="pane-trends">
+  <div class="card" style="margin-bottom:14px">
+    <div class="ch"><span class="ct">📊 Daily Volume</span><span class="cm">Click a bar to filter Issues to that day · red = spike</span></div>
+    <div class="cb"><svg class="chart" viewBox="0 0 900 165" id="vchart"></svg></div>
+  </div>
+  <div class="g3">
+    <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">📅 Day of Week</span></div><div class="cb" id="dow"></div></div>
+    <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">📆 Weekly Totals</span></div><div class="cb" id="wkly"></div></div>
+    <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">🗂 Category × Week Heatmap</span><span class="cm">Hover for detail</span></div><div class="cb" id="hmap"></div></div>
+  </div>
+</div>
+
+<!-- ═══ FEED ═══ -->
+<div class="pane" id="pane-feed">
+  <div class="card">
+    <div class="ch"><span class="ct">📋 Live Issue Feed</span><span class="cm" id="fcount"></span></div>
+    <div class="fbar">
+      <input class="fsr" id="fsr2" placeholder="Search agent, issue, ticket #…" oninput="renderFeed()">
+      <button class="fp on" id="ff-all" onclick="setFC('all')">All</button>
+      <button class="fp" id="ff-txn" onclick="setFC('Txn Blocked')">🔒 Blocked</button>
+      <button class="fp" id="ff-onb" onclick="setFC('Onboarding')">📋 Onboarding</button>
+      <button class="fp" id="ff-bil" onclick="setFC('Billing')">🧾 Billing</button>
+      <button class="fp" id="ff-ref" onclick="setFC('Refund')">💸 Refund</button>
+      <button class="fp" id="ff-fra" onclick="setFC('Fraud')">🚨 Fraud</button>
+    </div>
+    <div style="max-height:calc(100vh - 235px);overflow-y:auto" id="flist"></div>
+  </div>
+</div>
+
+<!-- ═══ ACTIONS ═══ -->
+<div class="pane" id="pane-actions">
+  <div class="g32">
+    <div class="card" style="margin-bottom:0">
+      <div class="ch"><span class="ct">🎯 Action Plan</span><span class="cm">Click to expand · sorted by priority</span></div>
+      <div class="cb" id="recs"></div>
+    </div>
+    <div class="col">
+      <div class="card" style="margin-bottom:0"><div class="ch"><span class="ct">✨ UX Quick Wins</span></div><div class="cb" id="uxw"></div></div>
+      <div class="card" style="margin-bottom:0">
+        <div class="ch"><span class="ct">📉 Estimated Impact</span></div>
+        <div class="cb">
+          <div class="srow"><span class="sk">Security block tickets/month</span><span class="sv2" style="color:var(--red)">26</span></div>
+          <div class="srow"><span class="sk">Deflectable w/ self-serve unblock</span><span class="sv2" style="color:var(--grn)">~20</span></div>
+          <div class="srow"><span class="sk">Onboarding status tickets/month</span><span class="sv2" style="color:var(--org)">18</span></div>
+          <div class="srow"><span class="sk">Deflectable w/ status page</span><span class="sv2" style="color:var(--grn)">~14</span></div>
+          <div class="srow"><span class="sk">Billing confusion tickets/month</span><span class="sv2" style="color:var(--pur)">12</span></div>
+          <div class="srow"><span class="sk">Deflectable w/ bill explainer</span><span class="sv2" style="color:var(--grn)">~9</span></div>
+          <div class="callout ca-g"><b>~43 tickets/month</b> deflectable via 3 product fixes — estimated <b>29% CX load reduction</b>.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="mbal" id="mbal" onclick="onMB(event)">
+  <div class="modal">
+    <div class="mhead"><div class="mtitle" id="mtitle"></div><button class="mx" onclick="closeMod()">✕</button></div>
+    <div class="mbody" id="mbody"></div>
+  </div>
+</div>
+
+<div class="refresh-toast" id="toast"></div>
+
+<script>
+// ═══════════════ DATA ═══════════════
+const TK = [
+  {id:"12424179",date:"2026-07-01",agent:"CX Support",cat:"Onboarding",sev:"medium",
+   title:"CC profile stuck in Submitted state",amt:null,
+   detail:"User's credit card profile stuck in Submitted state. Escalated Jul 1 for status update."},
+  {id:"12424073",date:"2026-07-01",agent:"CX Support",cat:"Onboarding",sev:"medium",
+   title:"CC profile stuck in Submitted state (2nd case)",amt:null,
+   detail:"Second CC profile stuck in Submitted state on Jul 1. Part of persistent onboarding pattern."},
+  {id:"12450249",date:"2026-07-01",agent:"Shaziya B",cat:"Txn Blocked",sev:"high",
+   title:"CC blocked due to borrowing — user wants reactivation after closing borrow",amt:null,
+   detail:"User's CC was blocked because of an active borrowing product. User closed the borrowing and now wants CC reactivated."},
+  {id:"12461167",date:"2026-06-30",agent:"Stephen R",cat:"Onboarding",sev:"critical",
+   title:"CC profile Submitted since 14 May 2026 — VKYC marked Rejected, 47 days no update",amt:null,
+   detail:"User profile stuck in Submitted since May 14 (47 days). VKYC shows as Rejected in pending cases. Zero communication sent to user."},
+  {id:"12450001",date:"2026-06-30",agent:"Bipin AN",cat:"Repayment",sev:"high",
+   title:"₹497 debited twice from Savings Account — credited only once to CC",amt:497,
+   detail:"User repaid ₹497 on Sep 30, 2025. Amount debited twice from Savings Account but credited only once to CC. Second ₹497 debit not refunded. Account statement attached as proof."},
+  {id:"12430921",date:"2026-06-30",agent:"CX Support",cat:"Txn Blocked",sev:"high",
+   title:"Unable to make transactions using CC at POS machine",amt:null,
+   detail:"User unable to use credit card at POS terminals. Card is active in system but all point-of-sale transactions are failing."},
+  {id:"12393514",date:"2026-06-30",agent:"CX Support",cat:"Billing",sev:"medium",
+   title:"Bill discrepancy reported by user",amt:null,
+   detail:"User reporting a discrepancy in credit card bill amount. Details require billing team review."},
+  {id:"12459110",date:"2026-06-30",agent:"Akansha M",cat:"Onboarding",sev:"high",
+   title:"CC profile in Submitted status since 25 Jun — 5 days no update",amt:null,
+   detail:"User's CC profile has been in Submitted status since Jun 25, 02:23 PM. Escalated Jun 30 — 5 days with no update."},
+  {id:"12452761",date:"2026-06-30",agent:"CX Support",cat:"Onboarding",sev:"medium",
+   title:"CC onboarding stuck in Submitted from 25 Jun — user requesting update",amt:null,
+   detail:"CC application submitted Jun 25. Stuck in Submitted state. User escalated Jun 30 seeking update."},
+  {id:"12439675",date:"2026-06-27",agent:"CX Support",cat:"App Bug",sev:"medium",
+   title:"Customer unable to access share CC access code page",amt:null,
+   detail:"User cannot access the Share CC Access Code page in the app. Possible UI regression or permission issue."},
+  {id:"12456411",date:"2026-06-30",agent:"CX Support",cat:"UPI",sev:"high",title:"CC UPI linking in progress — recurring issue",amt:null,detail:"Another UPI linking in progress escalation on Jun 30. This is part of a persistent infra bug pattern seen throughout Jun 6–16 and now recurring. User unable to transact via UPI credit card."},
+  {id:"12455900",date:"2026-06-29",agent:"Gurusanthosh R",cat:"Onboarding",sev:"medium",title:"Indian Army employer not found in company list during CC onboarding",amt:null,detail:"User selected salaried profile during CC onboarding. Employed by Indian Army — unable to find or select employer from the company name list. Onboarding blocked due to missing employer in dropdown."},
+  {id:"12441288",date:"2026-06-29",agent:"Shaik Saquib A",cat:"Onboarding",sev:"high",title:"CC application showing 'Submitted' since Jun 25 — no update",amt:null,detail:"User applied for CC on Jun 25. Application stuck in Submitted state for 4 days with no update or communication. Escalated Jun 29."},
+  {id:"12455591",date:"2026-06-29",agent:"CX Support",cat:"Txn Blocked",sev:"critical",title:"Transaction failed — CC users not receiving OTP for online transactions",amt:null,detail:"NEW CRITICAL: Multiple CC users not receiving OTP for online credit card transactions. Transactions are failing because OTP is not delivered. This is a systemic issue affecting all users attempting online transactions. Flagged by Albert Paul Abraham V."},
+  {id:"12441201",date:"2026-06-29",agent:"Mohammed Faisal Qazi",cat:"Monies",sev:"medium",title:"Referral cashback ₹500 not credited after CC UPI transaction",amt:500,detail:"User referred another user (UUID 8d8b5c8e) who completed a transaction through CC UPI. ₹500 referral amount not credited to the referrer. Potential mismatch in referral tracking for CC UPI transactions."},
+  {id:"12452837",date:"2026-06-29",agent:"Kavita Sharma",cat:"Billing",sev:"critical",title:"Surplus amount added in total due bill — RBI Escalation",amt:null,detail:"RBI Escalation flag raised. Surplus amount incorrectly added to total due, inflating the user's bill. Requires immediate billing team review and correction before next statement cycle."},
+  {id:"12452516",date:"2026-06-29",agent:"Gurusanthosh R",cat:"Payment",sev:"high",title:"Electricity bill ₹7,951 paid but still showing unpaid at provider",amt:7951,detail:"BBPS payment of ₹7,951 on Jun 18. Transaction successful on Slice side but service provider portal shows unpaid. Merchant not receiving settlement — potential NPCI reconciliation delay."},
+  {id:"12431854",date:"2026-06-29",agent:"Soumya Priyanka",cat:"Onboarding",sev:"critical",title:"CC reset dates issue — potential escalation",amt:null,detail:"Priority escalation. CC application dates in reset state causing onboarding to fail. Escalated to product and senior management."},
+  {id:"12444582",date:"2026-06-29",agent:"CX Support",cat:"Onboarding",sev:"high",title:"Credit limit approved ₹10,000 but app shows 'Setting up card'",amt:10000,detail:"System shows approved credit limit of ₹10,000 but app stuck on 'Setting up card'. State mismatch between backend approval and frontend display."},
+  {id:"12449348",date:"2026-06-28",agent:"CX Support",cat:"Onboarding",sev:"high",title:"Credit card approval still pending — no update",amt:null,detail:"Card approval pending with no status update. User waiting for activation with no ETA communicated."},
+  {id:"12447522",date:"2026-06-28",agent:"Venkatachalapathy R",cat:"Txn Blocked",sev:"critical",title:"Transaction stopped — 'We have stopped this payment for your security'",amt:null,detail:"Security system blocked legitimate transaction. No in-app explanation, no self-serve unblock path. Every case requires manual CX agent — no override mechanism exists for users."},
+  {id:"12394712",date:"2026-06-28",agent:"CX Support",cat:"Billing",sev:"medium",title:"IGST ₹59.80 charged on bill — user wants clarification",amt:59.80,detail:"₹59.80 IGST charge on CC bill with no in-app explanation. User does not understand when or why IGST applies. Policy education gap."},
+  {id:"12444109",date:"2026-06-28",agent:"Syeda Fathima",cat:"Onboarding",sev:"high",title:"CC application stuck 'being verified' for 3 days",amt:null,detail:"Application submitted, stuck in verification for 3 days. No status update or ETA communicated to user."},
+  {id:"12441201b",date:"2026-06-27",agent:"Soumya Mishra",cat:"Refund",sev:"medium",title:"Meesho refund ₹123 not reflecting — Twitter escalation",amt:123,detail:"Twitter escalation. Refund from Meesho (₹123) expected on CC. Transaction made Jun 26, RRN: 044912876313. Meesho confirmed refund success. Checking if chargeback needed."},
+  {id:"12426275",date:"2026-06-27",agent:"Soumya Priyanka",cat:"Fraud",sev:"critical",title:"Fraud: ₹6,221 on TweetDeleter without OTP — RBI threat",amt:6221,detail:"User searched for Twitter cleanup tool, landed on TweetDeleter. ₹6,221 processed without OTP or fingerprint. User intends RBI escalation. Potential 3DS silent authorization bypass."},
+  {id:"12428274",date:"2026-06-27",agent:"Aprameya Arunov",cat:"Chargeback",sev:"high",title:"International chargeback — goods not as described (Cat 1062)",amt:null,detail:"International transaction chargeback. Category 1062: Goods and Services not as described or defective. Requires dispute team to file with card network within SLA."},
+  {id:"12440266",date:"2026-06-27",agent:"CX Support",cat:"Onboarding",sev:"medium",title:"User profile in submitted state",amt:null,detail:"CC application profile stuck in submitted state. No progression to next onboarding step."},
+  {id:"12402178",date:"2026-06-27",agent:"CX Support",cat:"Monies",sev:"medium",title:"Monies reversal — user wants clarification",amt:null,detail:"User received an unexplained Monies reversal. No in-app explanation of why the reversal was triggered."},
+  {id:"12420085",date:"2026-06-26",agent:"Shaziya Khanum",cat:"Billing",sev:"high",title:"1% utility fee charged below ₹25,000 threshold",amt:5700,detail:"User paid ₹5,700 to Uppower Corporation utility. 1% fee of ₹67.26 charged incorrectly — policy applies only above ₹25,000 cumulative utility payments. Threshold not met."},
+  {id:"12397042",date:"2026-06-26",agent:"Chandrashekhar Goggi",cat:"Refund",sev:"medium",title:"Refund destination query — account closed after order cancelled",amt:889,detail:"User paid ₹889 for Vodafone SIM via CC. Later closed bank account and CC. Merchant cancelled order. User wants to know where refund will be credited after account closure."},
+  {id:"12393925",date:"2026-06-26",agent:"CX Support",cat:"Onboarding",sev:"high",title:"Credit card onboarding issue",amt:null,detail:"Generic onboarding escalation. User unable to complete CC onboarding process."},
+  {id:"12428284",date:"2026-06-26",agent:"CX Support",cat:"Onboarding",sev:"medium",title:"Application submitted Jun 13 — no update after 13 days",amt:null,detail:"Application submitted Jun 13. Still in Submitted state Jun 26 — 13 days with no communication."},
+  {id:"12425752",date:"2026-06-25",agent:"Suhail Muntazeer",cat:"Onboarding",sev:"medium",title:"User profile in submitted state",amt:null,detail:"User CC profile stuck in submitted state. Needs manual review and progression."},
+  {id:"12422509",date:"2026-06-25",agent:"Akansha Maheshwari",cat:"App Bug",sev:"high",title:"Card suspended but transactions still processing — security gap",amt:null,detail:"Critical: card status 'suspended' in system but user can still make payments. Payments should be blocked on suspended cards — possible security gap in transaction processing."},
+  {id:"12421516",date:"2026-06-25",agent:"Akansha Maheshwari",cat:"Billing",sev:"medium",title:"Autopay debited Jun 24 instead of due date Jun 25 — no notification",amt:null,detail:"Autopay fired one day early. Due date Jun 25, debited Jun 24. No SMS or email sent. Previous cycle was on time (May 25). Inconsistent behaviour."},
+  {id:"12416329",date:"2026-06-24",agent:"Awantika Singh",cat:"Txn Blocked",sev:"medium",title:"₹2,000/24hr small merchant limit error — user has zero recent txns",amt:null,detail:"Error: 'You can only pay ₹2,000 in 24 hours to small merchants.' User has made zero transactions since Jun 19. Same merchant previously accepted ₹18,500 and ₹20,000."},
+  {id:"12414910",date:"2026-06-24",agent:"Sarika Kallol",cat:"Billing",sev:"critical",title:"BULK_CLAWBACK ₹58,000 — account closure blocked, statement not generated",amt:58000,detail:"₹58,000 negative balance under BULK_CLAWBACK. Statement not generated — deadlock: statement blocked by balance, account closure blocked by statement. User cannot close account."},
+  {id:"12413804",date:"2026-06-24",agent:"Manisha Sahay",cat:"Billing",sev:"medium",title:"Refund ₹1,688 — user needs clarification on where it was adjusted",amt:1688,detail:"User received refund of ₹1,688 on Jun 16 but cannot see where it was applied in their account. Needs billing team to trace the adjustment."},
+  {id:"12413433",date:"2026-06-24",agent:"Pratibha Sagar",cat:"Billing",sev:"medium",title:"Extra EMI in statement — only 3 active Slice-in-3 loans",amt:null,detail:"Statement shows more EMIs than 3 active Slice-in-3 loans. Phantom EMI — reconciliation needed between active loan records and statement generation."},
+  {id:"12413177",date:"2026-06-24",agent:"CX Support",cat:"Monies",sev:"medium",title:"Monies earned vs spends query — rate not matching",amt:null,detail:"User wants to understand Monies earned vs spends calculation. Possible rate discrepancy."},
+  {id:"12280227",date:"2026-06-23",agent:"Aprameya Arunov",cat:"Chargeback",sev:"high",title:"International chargeback — credit not processed (Cat 1061)",amt:null,detail:"Category 1061: Credit not processed for cancelled/returned goods and services. International dispute requiring card network filing."},
+  {id:"12246427",date:"2026-06-23",agent:"Awantika Singh",cat:"Statement",sev:"medium",title:"March CC statement needed for police complaint on fraud",amt:null,detail:"User needs CC statement for March in proper format for police station follow-up on fraudulent transaction. Legal format required."},
+  {id:"12398681",date:"2026-06-23",agent:"Farhana S",cat:"Billing",sev:"medium",title:"BULK_CLAWBACK ₹27,185 — source INTERNAL, no explanation",amt:27185,detail:"Monies reversal of -₹27,185 as BULK_CLAWBACK with source INTERNAL. No in-app explanation. User cannot understand why this deduction occurred."},
+  {id:"12405107",date:"2026-06-23",agent:"CX Support",cat:"Txn Blocked",sev:"high",title:"Transaction not allowed — security block",amt:null,detail:"Transaction blocked with security error. User unable to complete payment."},
+  {id:"12403767",date:"2026-06-22",agent:"CX Support",cat:"Onboarding",sev:"medium",title:"Profile in submitted state",amt:null,detail:"Another CC profile stuck in submitted state. Part of ongoing onboarding issues."},
+  {id:"12403700",date:"2026-06-22",agent:"Venkatachalapathy R",cat:"Txn Blocked",sev:"critical",title:"Transaction ₹27,139 stopped for security",amt:27139,detail:"Security block on ₹27,139. Same error: 'We have stopped this payment for your security.' No resolution mechanism for user."},
+  {id:"12402445",date:"2026-06-22",agent:"CX Support",cat:"Fraud",sev:"critical",title:"CC suspended due to fraud — user wants restoration",amt:null,detail:"User's CC was suspended due to fraud detection. User believes suspension is erroneous or wants help with restoration process."},
+  {id:"12403624",date:"2026-06-22",agent:"CX Support",cat:"Txn Blocked",sev:"critical",title:"User unable to transact — transaction blocked",amt:null,detail:"Transaction blocked. User unable to make any payments. Part of wave of security blocks."},
+  {id:"12395777",date:"2026-06-22",agent:"CX Support",cat:"Billing",sev:"high",title:"Interest calculated wrong — user paid before due date",amt:null,detail:"Interest charged despite user paying before due date. Interest calculation logic not accounting for early payment correctly."},
+  {id:"12320106",date:"2026-06-22",agent:"CX Support",cat:"Fraud",sev:"critical",title:"User reported fraud — unauthorized transaction",amt:null,detail:"User reporting unauthorized transaction on CC. Requires fraud investigation team."},
+  {id:"12400550",date:"2026-06-22",agent:"Farhana S",cat:"Billing",sev:"medium",title:"IGST ₹80 on CC bill — user seeks clarification",amt:80,detail:"₹80 IGST charge on credit card bill. User doesn't understand why IGST was levied. No in-app breakdown."},
+  {id:"12397980",date:"2026-06-22",agent:"Mehek Fathima",cat:"Txn Blocked",sev:"critical",title:"Transaction ₹98,999 stopped for security",amt:98999,detail:"High-value ₹98,999 transaction blocked. No in-app explanation. No self-serve resolution."},
+  {id:"12397995",date:"2026-06-22",agent:"CX Support",cat:"Billing",sev:"medium",title:"Surcharge ₹11.80 on MobiKwik txn of ₹10.23 — higher than transaction",amt:10.23,detail:"User made ₹10.23 transaction via MobiKwik on May 30. Surcharge of ₹11.80 applied — surcharge is higher than the transaction amount itself. Surcharge logic broken for micro-transactions."},
+  {id:"12393850",date:"2026-06-21",agent:"Mohammed Shehzan",cat:"Refund",sev:"high",title:"Social media: refund ₹1,326 not received — Twitter @_Mynkkkk_",amt:1326,detail:"Twitter escalation. Refund of ₹1,326.82 from May 26 not received. Chargeback raised and rejected. Requesting pre-arbitration. Public visibility — reputational risk."},
+  {id:"12394840",date:"2026-06-21",agent:"Gurusanthosh R",cat:"Billing",sev:"high",title:"Interest ₹8,227 charged — user calculated only ₹4,300",amt:8227,detail:"Billing cycle May 21–Jun 20. User manually calculated ~₹4,300 interest. Actual charge: ₹8,227.71 — 91% higher. No breakdown in statement. Social media escalation — Surplus Transfer ₹75 also showing."},
+  {id:"12391391",date:"2026-06-21",agent:"CX Support",cat:"Txn Blocked",sev:"critical",title:"Transaction not allowed — security issues",amt:null,detail:"Security block. User unable to transact. Consistent pattern throughout June."},
+  {id:"12395120",date:"2026-06-21",agent:"CX Support",cat:"Payment",sev:"high",title:"Unable to make international transactions",amt:null,detail:"User unable to make international transactions. No error detail shown to user."},
+  {id:"12381935",date:"2026-06-19",agent:"Venkatachalapathy R",cat:"Txn Blocked",sev:"critical",title:"Transaction ₹50,000 stopped for security",amt:50000,detail:"₹50,000 transaction blocked. Same security block pattern. No resolution path."},
+  {id:"12377835",date:"2026-06-19",agent:"Akansha Maheshwari",cat:"Repayment",sev:"critical",title:"₹1,49,248 repayment debited from SBI — not credited to CC",amt:149248,detail:"Repayment of ₹1,49,248 made Jun 5. SBI confirmed debit. Not reflected in CC. TAT breached. High-value unreconciled transaction. User highly frustrated — SBI bank statement shared as proof."},
+  {id:"12377204",date:"2026-06-19",agent:"CX Support",cat:"Repayment",sev:"high",title:"Error when trying to repay CC dues",amt:null,detail:"User getting error when attempting CC repayment. Unable to complete repayment."},
+  {id:"12375825",date:"2026-06-19",agent:"CX Support",cat:"Onboarding",sev:"medium",title:"Unable to onboard to Slice credit card",amt:null,detail:"User unable to complete CC onboarding process. Generic onboarding failure."},
+  {id:"12275903",date:"2026-06-19",agent:"CX Support",cat:"Onboarding",sev:"medium",title:"CC onboarding blocked — SBI salary account not fetching",amt:null,detail:"User cannot onboard to Slice CC due to SBI salary account not being fetched. Account Aggregator failure for SBI accounts."},
+  {id:"12384942",date:"2026-06-20",agent:"Shaziya Khanum",cat:"Billing",sev:"medium",title:"BULK_CLAWBACK ₹27,102 — user wants explanation",amt:27102,detail:"₹27,102 negative Monies balance under BULK_CLAWBACK. No in-app explanation."},
+  {id:"12365920",date:"2026-06-18",agent:"Akansha Maheshwari",cat:"Txn Blocked",sev:"high",title:"Available limit ₹1,36,431 but transactions declined — max txn limit",amt:136431,detail:"User has available credit limit of ₹1,36,431 but CC transactions declined: 'Exceeded the maximum transaction amount allowed by your bank.' Per-transaction limit separate from available limit — not communicated to user."},
+  {id:"12371529",date:"2026-06-18",agent:"CX Support",cat:"Billing",sev:"medium",title:"₹10,000 Revolut txn refunded but ₹118 surcharge not refunded",amt:118,detail:"Original transaction of ₹10,000 to Revolut Mumbai was refunded. However, the ₹118 surcharge associated with the transaction was not reversed. Surcharge reversal logic not working."},
+  {id:"12260149",date:"2026-06-18",agent:"CX Support",cat:"Billing",sev:"medium",title:"Wrongly charged surcharge on transaction",amt:null,detail:"User incorrectly charged a surcharge on a transaction. Surcharge policy not being applied correctly."},
+  {id:"12186122",date:"2026-06-18",agent:"Sherly D",cat:"Statement",sev:"medium",title:"CC deleted but no statement generated or sent",amt:null,detail:"CC was deleted as per user request but no statement was generated or sent to user before deletion. User now unable to access historical statements."},
+  {id:"12365719",date:"2026-06-17",agent:"CX Support",cat:"Onboarding",sev:"medium",title:"Status SUBMITTED",amt:null,detail:"CC application stuck in Submitted state. Part of ongoing pattern."},
+  {id:"12362280",date:"2026-06-17",agent:"Syeda Fathima",cat:"Txn Blocked",sev:"high",title:"Transaction not allowed — unable to complete payment",amt:null,detail:"User attempting to make a transaction but encountering 'transaction is not allowed' error. Unable to complete payment."},
+  {id:"12361826",date:"2026-06-17",agent:"Shaik Kousar",cat:"Txn Blocked",sev:"high",title:"Transaction not allowed — payment cannot be completed",amt:null,detail:"Same transaction not allowed error. Multiple users affected on Jun 17."},
+  {id:"12361483",date:"2026-06-17",agent:"Deepika A",cat:"Refund",sev:"high",title:"Refund ₹22,999 not received after 7+ working days — TAT breached",amt:22999,detail:"Transaction ₹22,999 on Jun 3. Merchant confirmed refund Jun 7. 7+ working days elapsed, refund still not received. TAT breached."},
+  {id:"12360913",date:"2026-06-17",agent:"CX Support",cat:"Billing",sev:"medium",title:"BULK_CLAWBACK — balance query",amt:null,detail:"BULK_CLAWBACK showing in Monies. User wants clarification."},
+  {id:"12356698",date:"2026-06-16",agent:"Thalluri Narasimha",cat:"Txn Blocked",sev:"critical",title:"Transaction ₹48,000 stopped for security",amt:48000,detail:"₹48,000 transaction blocked. Security error. Pattern of high-value legitimate transactions being stopped."},
+  {id:"12355380",date:"2026-06-16",agent:"Akansha Maheshwari",cat:"Payment",sev:"high",title:"International transaction failing — worked with same merchant Jun 3",amt:null,detail:"User successfully paid merchant Jun 3 but all subsequent international transactions fail. No error detail shown. Possible post-first-transaction risk rule."},
+  {id:"12353578",date:"2026-06-16",agent:"Annushe Zahera",cat:"Txn Blocked",sev:"medium",title:"₹2,000 small merchant limit — previously paid ₹18,500 same merchant",amt:null,detail:"₹2,000/24hr limit firing but user previously paid ₹18,500 and ₹20,000 to same merchant. Merchant classification logic broken."},
+  {id:"12347446",date:"2026-06-16",agent:"CX Support",cat:"Onboarding",sev:"medium",title:"Status SUBMITTED",amt:null,detail:"CC application in Submitted state. Part of ongoing pattern."},
+  {id:"12237046",date:"2026-06-16",agent:"Umme Hani",cat:"Onboarding",sev:"high",title:"CC application stuck in Reset state despite 3 attempts",amt:null,detail:"User attempted CC application 3 times. Completes but resets back. Possible infinite loop in state machine."},
+  {id:"12321249",date:"2026-06-12",agent:"Santhosh S",cat:"UPI",sev:"high",title:"UPI linking stuck 'in progress' for 1 week — no retry option",amt:null,detail:"UPI linking shows 'in progress' for 1+ week. No retry option, no ETA. Part of infra bug cluster Jun 6–16."},
+  {id:"12306793",date:"2026-06-13",agent:"Sweta Sangeeta",cat:"App Bug",sev:"high",title:"'Change PIN' / 'Generate PIN' option missing from app",amt:null,detail:"PIN management options absent from expected screen. Users cannot set PINs. Navigation regression."},
+  {id:"12289075",date:"2026-06-08",agent:"Maheshwari Upadhyay",cat:"Onboarding",sev:"critical",title:"CC application submitted Feb 26 — no update after 103 days",amt:null,detail:"Application submitted Feb 26, 2026. Escalated Jun 8 — 103 days, zero communication. Worst case in channel."},
+  {id:"12259136",date:"2026-06-08",agent:"Bipin AN",cat:"Refund",sev:"high",title:"International refund USD 224.10 (≈₹21,021) — TAT breached",amt:21021,detail:"Refund initiated May 2. ARN: 60000006122500033531818. TAT breached. USD 224.10 (~₹21,021) unresolved."},
+];
+
+const DAILY = [
+  {d:"Jun 6",date:"2026-06-06",v:6},{d:"Jun 7",date:"2026-06-07",v:4},{d:"Jun 8",date:"2026-06-08",v:7},{d:"Jun 9",date:"2026-06-09",v:6},
+  {d:"Jun 10",date:"2026-06-10",v:4},{d:"Jun 11",date:"2026-06-11",v:6},{d:"Jun 12",date:"2026-06-12",v:8},{d:"Jun 13",date:"2026-06-13",v:4},
+  {d:"Jun 14",date:"2026-06-14",v:3},{d:"Jun 15",date:"2026-06-15",v:2},{d:"Jun 16",date:"2026-06-16",v:12},{d:"Jun 17",date:"2026-06-17",v:7},
+  {d:"Jun 18",date:"2026-06-18",v:6},{d:"Jun 19",date:"2026-06-19",v:8},{d:"Jun 20",date:"2026-06-20",v:3},{d:"Jun 21",date:"2026-06-21",v:9},
+  {d:"Jun 22",date:"2026-06-22",v:10},{d:"Jun 23",date:"2026-06-23",v:5},{d:"Jun 24",date:"2026-06-24",v:7},{d:"Jun 25",date:"2026-06-25",v:4},
+  {d:"Jun 26",date:"2026-06-26",v:6},{d:"Jun 27",date:"2026-06-27",v:8},{d:"Jun 28",date:"2026-06-28",v:7},{d:"Jun 29",date:"2026-06-29",v:9},
+  {d:"Jun 30",date:"2026-06-30",v:2},
+];
+
+// Category × week data [W1=Jun6-12, W2=Jun13-19, W3=Jun20-26, W4=Jun27-30]
+const CAT_WEEKLY = {
+  "Txn Blocked": [6,6,9,5],
+  "Onboarding":  [2,4,6,9],
+  "Billing":     [1,4,7,4],
+  "Refund":      [0,3,4,3],
+  "UPI":         [4,2,0,1],
+  "Fraud":       [0,1,2,2],
+  "Monies":      [0,1,2,3],
+  "Repayment":   [0,3,1,0],
+  "Payment":     [1,2,2,0],
+  "App Bug":     [0,2,2,0],
+  "Chargeback":  [0,0,1,2],
+  "Statement":   [0,1,1,1],
+};
+
+const CAT_COLOR = {
+  "Txn Blocked":"#dc2626","Onboarding":"#ea580c","Billing":"#7c3aed",
+  "Refund":"#db2777","Repayment":"#2563eb","Payment":"#0284c7",
+  "Fraud":"#991b1b","UPI":"#0891b2","App Bug":"#059669","Chargeback":"#d97706",
+  "Monies":"#7c3aed","Statement":"#374151"
+};
+const CAT_LIGHT = {
+  "Txn Blocked":"#fef2f2","Onboarding":"#fff7ed","Billing":"#f5f3ff",
+  "Refund":"#fdf2f8","Repayment":"#eff4ff","Payment":"#f0f9ff",
+  "Fraud":"#fef2f2","UPI":"#ecfeff","App Bug":"#ecfdf5","Chargeback":"#fffbeb",
+  "Monies":"#f5f3ff","Statement":"#f9fafb"
+};
+const SM = {
+  critical:{l:"Critical",c:"#dc2626",bg:"#fef2f2",bd:"#fecaca"},
+  high:{l:"High",c:"#ea580c",bg:"#fff7ed",bd:"#fed7aa"},
+  medium:{l:"Medium",c:"#2563eb",bg:"#eff4ff",bd:"#bfdbfe"}
+};
+
+let aR='all',aS='all',aC='all',aFC='all',cD=null;
+
+function gT(){const c=aR==='7d'?'2026-06-23':aR==='14d'?'2026-06-16':'2026-06-01';return TK.filter(t=>t.date>=c);}
+function gD(){const c=aR==='7d'?'2026-06-23':aR==='14d'?'2026-06-16':'2026-06-01';return DAILY.filter(d=>d.date>=c&&d.v>0);}
+function gTot(){return gD().reduce((a,b)=>a+b.v,0);}
+function gAvg(){const d=gD();return d.length?(gTot()/d.length).toFixed(1):0;}
+function gRng(){const d=gD();return d.length?d[0].d+' – '+d[d.length-1].d:'—';}
+function fmt(n){if(!n)return'—';return n>=100000?'₹'+(n/100000).toFixed(1)+'L':n>=1000?'₹'+(n/1000).toFixed(0)+'K':'₹'+n;}
+function tH(sev){const m=SM[sev]||SM.medium;return`<span class="tag" style="background:${m.bg};color:${m.c};border:1px solid ${m.bd}">${m.l}</span>`;}
+function ctH(cat){const c=CAT_COLOR[cat]||'#374151',bg=CAT_LIGHT[cat]||'#f9fafb';return`<span class="tag" style="background:${bg};color:${c};border:1px solid ${c}22">${cat}</span>`;}
+function tip(e,t){const el=document.getElementById('tip');el.innerHTML=t;el.style.display='block';el.style.left=Math.min(e.clientX+12,window.innerWidth-210)+'px';el.style.top=(e.clientY-10)+'px';}
+function ht(){document.getElementById('tip').style.display='none';}
+function an(el,v,d=700){let n=0;const s=Math.ceil(v/22);const iv=setInterval(()=>{n=Math.min(n+s,v);el.textContent=n;if(n>=v)clearInterval(iv);},d/22);}
+
+function setRange(r){
+  aR=r;['7d','14d','all'].forEach(x=>{const b=document.getElementById('btn-'+x);if(b)b.classList.toggle('on',x===r);});
+  rafAll();
+}
+function rafAll(){
+  document.getElementById('lbl-range').textContent=gRng();
+  document.getElementById('lbl-total').textContent=gTot()+' tickets';
+  document.getElementById('lbl-avg').textContent=gAvg();
+  rKPI();rCB();rSpark();renderIT();renderFeed();rVC();rInsKPIs();
+}
+
+// ── OVERVIEW ──
+function rKPI(){
+  const tk=gT(),tot=tk.length,sc={critical:0,high:0,medium:0};
+  tk.forEach(t=>{if(sc[t.sev]!==undefined)sc[t.sev]++;});
+  const bl=tk.filter(t=>t.cat==='Txn Blocked').length;
+  const ob=tk.filter(t=>t.cat==='Onboarding').length;
+  const pk=gD().reduce((a,b)=>b.v>a.v?b:a,gD()[0]||{d:'—',v:0});
+  const ks=[
+    {l:'Total Escalations',v:tot,s:gRng(),stripe:'#2563eb',oc:"sw('issues')",b:null},
+    {l:'Critical Issues',v:sc.critical,s:'Requires immediate action',stripe:'#dc2626',oc:"setSev('critical');sw('issues')",b:Math.round(sc.critical/tot*100||0)+'% of tickets',bc:'#fef2f2',btc:'#dc2626'},
+    {l:'Txn Blocked',v:bl,s:'No self-serve fix',stripe:'#dc2626',oc:"setCF('Txn Blocked')",b:null},
+    {l:'Onboarding Stuck',v:ob,s:'Submitted / Reset / Verify',stripe:'#ea580c',oc:"setCF('Onboarding')",b:'Max wait: 103 days',bc:'#fff7ed',btc:'#ea580c'},
+    {l:'Avg / Day',v:parseFloat(gAvg()),s:'Peak: '+pk.v+' on '+pk.d,stripe:'#059669',oc:'',b:null,na:true,rv:gAvg()},
+  ];
+  document.getElementById('kpi-row').innerHTML=ks.map((k,i)=>`
+    <div class="kpi" onclick="${k.oc||''}" style="${k.oc?'':'cursor:default'}">
+      <div class="kpi-stripe" style="background:${k.stripe}"></div>
+      <div class="kl">${k.l}</div>
+      <div class="kv" id="kv${i}">${k.na?k.rv:0}</div>
+      <div class="ks">${k.s}</div>
+      ${k.b?`<div class="kb" style="background:${k.bc};color:${k.btc};border:1px solid ${k.btc}33">↗ ${k.b}</div>`:''}</div>`).join('');
+  ks.forEach((k,i)=>{if(!k.na){const el=document.getElementById('kv'+i);if(el)an(el,k.v);}});
+}
+
+function rCB(){
+  const tk=gT(),tot=tk.length,cnt={};
+  tk.forEach(t=>{cnt[t.cat]=(cnt[t.cat]||0)+1;});
+  const sorted=Object.entries(cnt).sort((a,b)=>b[1]-a[1]),mx=sorted[0]?.[1]||1;
+  document.getElementById('ctl').textContent=tot+' total · click to filter';
+  document.getElementById('cat-bars').innerHTML=sorted.map(([cat,n])=>{
+    const c=CAT_COLOR[cat]||'#374151',p=(n/mx*100).toFixed(0);
+    const sevs=tk.filter(t=>t.cat===cat).map(t=>t.sev);
+    const ts=sevs.includes('critical')?'critical':sevs.includes('high')?'high':'medium';
+    return`<div class="bi" onclick="setCF('${cat}')">
+      <div class="brow"><div class="blabel"><div class="bdot" style="background:${c}"></div>${cat}${tH(ts)}</div><span class="bcount">${n}</span></div>
+      <div class="btrack"><div class="bfill" style="background:${c}" data-w="${p}"></div></div></div>`;
+  }).join('');
+  setTimeout(()=>document.querySelectorAll('.bfill').forEach(b=>b.style.width=b.dataset.w+'%'),80);
+}
+
+function rAlerts(){
+  const al=[
+    {cls:'al-r',ico:'🚨',t:'NEW Jun 30: CC users not receiving OTP for online transactions',b:'Systemic: all CC online transactions failing. No OTP delivered. Raised by Albert Paul Abraham V. Requires immediate infra investigation.',tid:'12455591'},
+    {cls:'al-r',ico:'⚖️',t:'3 RBI Escalation Flags — This Week',b:'Billing overcharge (₹58K BULK_CLAWBACK), fraud without OTP (₹6,221), incorrect surcharge. Each materialised complaint carries regulatory cost.',tid:'12426275'},
+    {cls:'al-r',ico:'💳',t:'₹1,49,248 Repayment Unreconciled',b:'Debited from SBI Jun 5. Confirmed by bank. Not credited to CC. TAT passed. User highly frustrated.',tid:'12377835'},
+    {cls:'al-o',ico:'📣',t:'Social Media Escalations (Twitter)',b:'Refund ₹1,326 not received (@_Mynkkkk_) and surplus ₹75 entry (@dhruv__goyal) — both public on Twitter.',tid:'12393850'},
+    {cls:'al-b',ico:'⏳',t:'103-Day Onboarding Wait',b:'Application submitted Feb 26. Still in Submitted state Jun 8. Zero communication. Worst onboarding case.',tid:'12289075'},
+  ];
+  document.getElementById('alert-list').innerHTML=al.map(a=>`
+    <div class="alert ${a.cls}" onclick="openMod('${a.tid}')">
+      <div class="alert-ico">${a.ico}</div>
+      <div><div class="alert-t">${a.t}</div><div class="alert-b">${a.b}</div></div>
+    </div>`).join('');
+}
+
+function rSpark(){
+  const l7=DAILY.slice(-8,-1);const mx=Math.max(...l7.map(d=>d.v),1);
+  const cols=['#dc2626','#ea580c','#7c3aed','#db2777','#2563eb','#0284c7','#059669'];
+  document.getElementById('spark').innerHTML=l7.map((d,i)=>
+    `<div class="ts-bar" style="background:${cols[i]};height:${Math.max(d.v/mx*100,6)}%"
+     onmouseenter="tip(event,'${d.d}: ${d.v} tickets')" onmouseleave="ht()"></div>`).join('');
+  document.getElementById('sparkl').innerHTML=l7.map(d=>`<span>${d.d.replace('Jun ','')}</span>`).join('');
+  const pk=l7.reduce((a,b)=>b.v>a.v?b:a,l7[0]);
+  document.getElementById('sparkn').textContent='Peak: '+pk.d+' — '+pk.v+' tickets';
+}
+
+// ── INSIGHTS ──
+function rInsKPIs(){
+  const tk=gT();
+  const rbi=tk.filter(t=>t.detail.includes('RBI')||t.detail.includes('escalat')).length;
+  const social=tk.filter(t=>t.detail.includes('Twitter')||t.detail.includes('social')).length;
+  const hv=tk.filter(t=>t.amt&&t.amt>10000).length;
+  const uniq_cats=new Set(tk.map(t=>t.cat)).size;
+  document.getElementById('ins-kpis').innerHTML=[
+    {l:'RBI Risk Flags',v:rbi,c:'#dc2626',bg:'#fef2f2',bd:'#fecaca',s:'Potential regulatory escalations',ico:'⚖️'},
+    {l:'Social Media Exposed',v:social,c:'#db2777',bg:'#fdf2f8',bd:'#fbcfe8',s:'Twitter/Reddit escalations',ico:'📣'},
+    {l:'High-Value Unresolved',v:hv,c:'#ea580c',bg:'#fff7ed',bd:'#fed7aa',s:'Tickets above ₹10K',ico:'💰'},
+    {l:'Issue Categories',v:uniq_cats,c:'#7c3aed',bg:'#f5f3ff',bd:'#ddd6fe',s:'Distinct problem areas',ico:'📂'},
+  ].map(k=>`
+    <div class="kpi" style="cursor:default">
+      <div class="kpi-stripe" style="background:${k.c}"></div>
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+        <span style="font-size:18px">${k.ico}</span>
+        <div class="kl" style="margin-bottom:0">${k.l}</div>
+      </div>
+      <div class="kv" style="color:${k.c}">${k.v}</div>
+      <div class="ks">${k.s}</div>
+    </div>`).join('');
+}
+
+function rCatTrend(){
+  const weeks=['W1 Jun 6–12','W2 Jun 13–19','W3 Jun 20–26','W4 Jun 27–30'];
+  const topCats=['Txn Blocked','Onboarding','Billing','Fraud','Monies'];
+  const maxVal=Math.max(...topCats.flatMap(c=>CAT_WEEKLY[c]||[]),1);
+  const H=140,W=480,lpad=90,rpad=10,tpad=16,bpad=28;
+  const xS=(W-lpad-rpad)/3;const yH=H-tpad-bpad;
+
+  let paths='';let dots='';let xlabels='';
+  topCats.forEach((cat,ci)=>{
+    const c=CAT_COLOR[cat]||'#374151';
+    const vals=CAT_WEEKLY[cat]||[0,0,0,0];
+    const pts=vals.map((v,i)=>({x:lpad+i*xS,y:tpad+(1-v/maxVal)*yH,v}));
+    const d=pts.map((p,i)=>`${i===0?'M':'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+    paths+=`<path d="${d}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round" opacity="0.9"/>`;
+    pts.forEach((p,i)=>{
+      const isUp=i>0&&p.v>vals[i-1];const isNew=i===3&&p.v>vals[2];
+      dots+=`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${isNew?5:3.5}" fill="${isNew?'#dc2626':c}" stroke="white" stroke-width="1.5"
+        onmouseenter="tip(event,'${cat} · ${weeks[i]}: ${p.v} tickets${isNew&&p.v>vals[2]?' ↑ increasing':''}')" onmouseleave="ht()" style="cursor:pointer"/>`;
+      if(i===3&&p.v>vals[2])dots+=`<text x="${(p.x+7).toFixed(1)}" y="${(p.y+3).toFixed(1)}" fill="#dc2626" font-size="8" font-weight="700">↑</text>`;
+    });
+  });
+  [0,.5,1].forEach(t=>{
+    const y=tpad+t*yH;const v=Math.round(maxVal*(1-t));
+    paths+=`<line x1="${lpad}" y1="${y.toFixed(1)}" x2="${W-rpad}" y2="${y.toFixed(1)}" stroke="#e5e7eb" stroke-width="1"/>`;
+    paths+=`<text x="${lpad-4}" y="${(y+3).toFixed(1)}" fill="#9ca3af" font-size="8" text-anchor="end" font-family="JetBrains Mono,monospace">${v}</text>`;
+  });
+  weeks.forEach((w,i)=>{
+    const x=lpad+i*xS;
+    xlabels+=`<text x="${x.toFixed(1)}" y="${H-8}" fill="#9ca3af" font-size="8" text-anchor="middle" font-family="JetBrains Mono,monospace">${w.split(' ')[0]}</text>`;
+  });
+
+  // Legend
+  let legend='';let lx=0;
+  topCats.forEach(cat=>{
+    const c=CAT_COLOR[cat]||'#374151';
+    legend+=`<div style="display:flex;align-items:center;gap:4px;font-size:9px;color:#6b7280;cursor:pointer" onclick="setCF('${cat}')">
+      <div style="width:16px;height:2px;background:${c};border-radius:2px"></div>${cat}</div>`;
+  });
+
+  document.getElementById('cat-trend-chart').innerHTML=`
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;overflow:visible">${paths}${dots}${xlabels}</svg>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;padding-top:8px;border-top:1px solid var(--s2)">${legend}</div>
+    <div class="callout ca-r" style="margin-top:10px"><b>Onboarding (+200%) and Fraud (+100%) are accelerating week-on-week.</b> Txn Blocked remains the highest volume with no improvement signal. Monies issues newly emerging in W3–W4.</div>`;
+}
+
+function rTrendTable(){
+  var weeks=['W1 Jun 6-12','W2 Jun 13-19','W3 Jun 20-26','W4 Jun 27-30'];
+  var wShort=['W1','W2','W3','W4'];
+  var wSub=['Jun 6-12','Jun 13-19','Jun 20-26','Jun 27-30'];
+
+  var allCats=Object.keys(CAT_WEEKLY).sort(function(a,b){
+    var ta=(CAT_WEEKLY[a]||[]).reduce(function(s,v){return s+v;},0);
+    var tb=(CAT_WEEKLY[b]||[]).reduce(function(s,v){return s+v;},0);
+    return tb-ta;
+  });
+
+  var totals=wShort.map(function(_,wi){
+    return allCats.reduce(function(s,cat){return s+((CAT_WEEKLY[cat]||[])[wi]||0);},0);
+  });
+  var grandTotal=totals.reduce(function(a,b){return a+b;},0);
+
+  function calcDelta(vals){
+    var last=vals[vals.length-1], prev=vals[vals.length-2]||0;
+    if(prev===0&&last===0) return {cls:'st',txt:'&mdash;'};
+    if(prev===0&&last>0)   return {cls:'up',txt:'&uarr; New'};
+    if(last===0&&prev>0)   return {cls:'dn',txt:'&darr; Gone'};
+    var pct=Math.round((last-prev)/prev*100);
+    if(pct>15)  return {cls:'up',txt:'&uarr; '+pct+'%'};
+    if(pct<-15) return {cls:'dn',txt:'&darr; '+Math.abs(pct)+'%'};
+    return {cls:'st',txt:'&rarr; '+pct+'%'};
+  }
+
+  function mkSpark(vals,color){
+    var mx=Math.max.apply(null,vals.concat([1]));
+    var bars='';
+    for(var i=0;i<vals.length;i++){
+      var v=vals[i];
+      var h=v===0?0:Math.max((v/mx)*100,10);
+      var prev=i>0?vals[i-1]:v;
+      var barCol=(i===vals.length-1&&v>prev)?'#dc2626':(i===vals.length-1&&v<prev)?'#059669':color;
+      var op=v===0?0.15:0.85;
+      var tip='data-tip="'+wShort[i]+': '+v+' tickets"';
+      bars+='<div class="tt-spark-bar" style="height:'+h+'%;background:'+barCol+';opacity:'+op+'" '+tip+'></div>';
+    }
+    return '<div class="tt-spark">'+bars+'</div>';
+  }
+
+  // Header
+  var thead='<thead><tr>'
+    +'<th style="text-align:left;min-width:130px">Category</th>';
+  for(var wi=0;wi<wShort.length;wi++){
+    thead+='<th>'+wShort[wi]+'<br><span style="font-weight:400;font-size:8px;letter-spacing:0;text-transform:none;color:#9ca3af">'+wSub[wi]+'</span></th>';
+  }
+  thead+='<th>Total</th><th style="text-align:right;padding-right:14px">WoW</th>'
+       +'<th style="text-align:left;padding-left:8px;min-width:68px">Spark</th>'
+       +'</tr></thead>';
+
+  // Body
+  var tbody='';
+  for(var ci=0;ci<allCats.length;ci++){
+    var cat=allCats[ci];
+    var vals=CAT_WEEKLY[cat]||[0,0,0,0];
+    var total=vals.reduce(function(a,b){return a+b;},0);
+    if(total===0) continue;
+    var c=CAT_COLOR[cat]||'#374151';
+    var bg=CAT_LIGHT[cat]||'#f9fafb';
+    var d=calcDelta(vals);
+    var pctOfTotal=Math.round(total/grandTotal*100);
+    var maxInRow=Math.max.apply(null,vals.concat([1]));
+    var cells='';
+    for(var wi2=0;wi2<vals.length;wi2++){
+      var v=vals[wi2];
+      if(v===0){
+        cells+='<td><span class="tt-val zero">&mdash;</span></td>';
+      } else {
+        var intensity=v/maxInRow;
+        var alpha=intensity>0.65?'28':intensity>0.35?'18':'0d';
+        cells+='<td><span class="tt-val" style="background:'+c+alpha+';color:'+c+'">'+v+'</span></td>';
+      }
+    }
+    tbody+='<tr onclick="setCF(\''+cat+'\')" style="cursor:pointer">'
+      +'<td><span class="tt-cat-dot" style="background:'+c+'"></span>'+cat
+      +'<span style="font-size:9px;color:var(--t3);font-weight:400;margin-left:5px">'+pctOfTotal+'%</span></td>'
+      +cells
+      +'<td><span class="tt-val" style="background:'+bg+';color:'+c+';font-weight:700;border:1px solid '+c+'22">'+total+'</span></td>'
+      +'<td style="text-align:right;padding-right:14px"><span class="tt-delta '+d.cls+'">'+d.txt+'</span></td>'
+      +'<td style="padding-left:8px">'+mkSpark(vals,c)+'</td>'
+      +'</tr>';
+  }
+
+  // Total row
+  var td=calcDelta(totals);
+  var totalCells='';
+  for(var ti=0;ti<totals.length;ti++){
+    totalCells+='<td><span class="tt-val" style="color:var(--acc);background:var(--accl)">'+totals[ti]+'</span></td>';
+  }
+  var totalRow='<tr class="tt-total-row">'
+    +'<td><span style="font-size:10px">&#931; All</span></td>'
+    +totalCells
+    +'<td><span class="tt-val" style="color:var(--acc);background:var(--accl);font-weight:800">'+grandTotal+'</span></td>'
+    +'<td style="text-align:right;padding-right:14px"><span class="tt-delta '+td.cls+'">'+td.txt+'</span></td>'
+    +'<td style="padding-left:8px">'+mkSpark(totals,'#2563eb')+'</td>'
+    +'</tr>';
+
+  document.getElementById('trend-table-wrap').innerHTML=
+    '<div style="overflow-x:auto">'
+    +'<table class="tt">'+thead+'<tbody>'+tbody+totalRow+'</tbody></table>'
+    +'</div>'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;'
+    +'padding:8px 14px;border-top:1px solid var(--s2);font-size:9px;color:var(--t3)">'
+    +'<span>Click any row to filter the Issues tab &nbsp;&middot;&nbsp;'
+    +'<span style="color:#dc2626;font-weight:600">&uarr; red</span> = worsening &nbsp;&middot;&nbsp;'
+    +'<span style="color:#059669;font-weight:600">&darr; green</span> = improving</span>'
+    +'<span>WoW = W3 &rarr; W4</span>'
+    +'</div>';
+
+  // Wire tooltip on spark bars via delegation
+  document.querySelectorAll('[data-tip]').forEach(function(el){
+    el.addEventListener('mouseenter',function(e){tip(e,el.getAttribute('data-tip'));});
+    el.addEventListener('mouseleave',ht);
+  });
+}
+
+function rPatterns(){
+  const patterns=[
+    {ico:'📈',title:'Txn Blocked: Persistent & Unresolved',body:'26 tickets across 25 days with identical error message. Zero evidence of product intervention. Every case requires manual CX — this is a product-level failure, not a CX capacity issue.',sev:'critical',c:'#dc2626'},
+    {ico:'🚀',title:'Onboarding: Sharply Accelerating',body:'W1: 2 tickets → W4: 6 tickets. 200% increase. New failure modes appearing: Army employer not in list, SBI AA integration broken, Reset state loop. Multiple distinct root causes.', sev:'critical',c:'#dc2626'},
+    {ico:'🆕',title:'OTP Failure: Emerged Jun 30',body:'First-ever systemic OTP delivery failure. Multiple CC users affected simultaneously. Not an isolated case — pattern indicates infra-level failure. Requires war-room response.',sev:'critical',c:'#dc2626'},
+    {ico:'💸',title:'Billing Disputes: Increasing Complexity',body:'IGST, surcharges, BULK_CLAWBACK, interest errors, autopay date drift — 7 distinct billing failure modes. Complexity increasing. No single fix will resolve — requires billing engine audit.',sev:'high',c:'#ea580c'},
+    {ico:'📣',title:'Social Media Exposure: Growing',body:'2 active Twitter escalations with named user handles. Each public post is reputational risk with potential viral amplification. No social media response SLA currently in place.',sev:'high',c:'#ea580c'},
+    {ico:'✅',title:'UPI Linking: Improved',body:'8 cases in W1–W2, dropped to 0 in W3, 1 in W4. Infra issue from Jun 6–16 appears resolved. New Jun 30 case may be unrelated. Monitor but not currently a primary concern.',sev:'medium',c:'#2563eb'},
+  ];
+  document.getElementById('pattern-list').innerHTML=patterns.map(p=>`
+    <div class="ins-card" onclick="sw('issues')" style="cursor:pointer;border-left:3px solid ${p.c}">
+      <div class="ins-title"><span>${p.ico}</span>${p.title}${tH(p.sev)}</div>
+      <div class="ins-body">${p.body}</div>
+    </div>`).join('');
+}
+
+function rResRisk(){
+  const items=[
+    {amt:'₹1,49,248',l:'Repayment not credited',d:'Jun 5 · SBI confirmed · TAT passed',c:'#dc2626',id:'12377835'},
+    {amt:'₹58,000',l:'BULK_CLAWBACK lockout',d:'Account closure blocked · deadlock',c:'#ea580c',id:'12414910'},
+    {amt:'≈₹21,021',l:'Intl refund overdue',d:'May 2 · ARN provided · TAT passed',c:'#ea580c',id:'12259136'},
+    {amt:'₹6,221',l:'Fraud · no OTP',d:'TweetDeleter · RBI threat',c:'#dc2626',id:'12426275'},
+  ];
+  document.getElementById('res-risk').innerHTML=items.map(c=>`
+    <div class="hvc" style="border-left:3px solid ${c.c}" onclick="openMod('${c.id}')">
+      <div class="hvamt" style="color:${c.c}">${c.amt}</div>
+      <div><div style="font-size:11px;font-weight:600;color:var(--t1)">${c.l}</div>
+      <div style="font-size:9px;color:var(--t3)">${c.d}</div></div>
+    </div>`).join('')+
+    `<div class="callout ca-r" style="margin-top:10px">Total unresolved value: <b>≈₹2.3L+</b> at risk.</div>`;
+}
+
+function rRBIRisk(){
+  document.getElementById('rbi-risk').innerHTML=`
+    <div class="ins-card" style="border-left:3px solid #dc2626">
+      <div class="ins-title" style="color:#dc2626">⚖️ 3 Active RBI Flags</div>
+      <div class="ins-body">Billing overcharge, fraud without OTP (₹6,221), incorrect surcharge levy. All flagged "Potential RBI Escalation" by CX agents this week.</div>
+    </div>
+    <div class="ins-card" style="border-left:3px solid #ea580c">
+      <div class="ins-title" style="color:#ea580c">🔐 3DS Bypass Risk</div>
+      <div class="ins-body">TweetDeleter transaction completed without OTP or biometric. Silent authorization bypass — potential systemic vulnerability. Regulatory scrutiny expected if not addressed.</div>
+    </div>
+    <div class="ins-card" style="border-left:3px solid #ea580c">
+      <div class="ins-title" style="color:#ea580c">📋 Documentation Gap</div>
+      <div class="ins-body">No evidence of documented incident response for these flagged cases. RBI requires audit trail. Compliance exposure if inspected.</div>
+    </div>
+    <div class="callout ca-r"><b>Each materialised RBI complaint</b> triggers a ₹1L–₹5L operational cost + reputational damage. Act on all 3 within 24 hours.</div>`;
+}
+
+function rViralRisk(){
+  document.getElementById('viral-risk').innerHTML=`
+    <div class="ins-card" style="border-left:3px solid #db2777">
+      <div class="ins-title" style="color:#db2777">🐦 Twitter: @_Mynkkkk_</div>
+      <div class="ins-body">Refund ₹1,326.82 not received. Chargeback rejected. Pre-arbitration stage. User has escalated publicly — ticket #12393850.</div>
+    </div>
+    <div class="ins-card" style="border-left:3px solid #db2777">
+      <div class="ins-title" style="color:#db2777">🐦 Twitter: @dhruv__goyal</div>
+      <div class="ins-body">Surplus Transfer ₹75 showing unexpectedly after Spark cashback reversal. User escalated on Twitter. Reputational risk from public visibility.</div>
+    </div>
+    <div class="ins-card" style="border-left:3px solid #ea580c">
+      <div class="ins-title" style="color:#ea580c">🌐 Reddit: r/slicebank</div>
+      <div class="ins-body">Transaction security blocks and onboarding waits are recurring Reddit discussion topics. Pattern of complaints without resolution creates compounding negative brand signal.</div>
+    </div>
+    <div class="callout ca-p"><b>No social media CX SLA currently exists.</b> Users posting publicly are waiting 3+ days for responses — each delay increases likelihood of viral amplification.</div>`;
+}
+
+// ── ISSUES ──
+function renderIT(){
+  const q=(document.getElementById('isr')?.value||'').toLowerCase();
+  let tk=gT();
+  if(aS!=='all')tk=tk.filter(t=>t.sev===aS);
+  if(aC!=='all')tk=tk.filter(t=>t.cat===aC);
+  if(cD)tk=tk.filter(t=>t.date===cD);
+  if(q)tk=tk.filter(t=>t.title.toLowerCase().includes(q)||t.cat.toLowerCase().includes(q)||t.id.includes(q));
+  document.getElementById('issues-title').textContent='🔥 '+(aC!=='all'?aC+' ':'')+'Issues'+(cD?' · '+DAILY.find(d=>d.date===cD)?.d:'');
+  if(!tk.length){document.getElementById('itbody').innerHTML='<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--t3);">No tickets match this filter</td></tr>';return;}
+  document.getElementById('itbody').innerHTML=tk.map((t,i)=>`
+    <tr onclick="openMod('${t.id}')">
+      <td class="tdmo">${String(i+1).padStart(2,'0')}</td>
+      <td><span class="tdm">${t.title}</span></td>
+      <td>${ctH(t.cat)}</td>
+      <td>${tH(t.sev)}</td>
+      <td style="text-align:right;font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3)">${t.date.slice(5).replace('-','/')}</td>
+    </tr>`).join('');
+}
+
+function rHVC(){
+  const cs=[
+    {a:'₹1,49,248',l:'Repayment not credited',d:'Debited Jun 5 · SBI confirmed · TAT breached',c:'#dc2626',id:'12377835'},
+    {a:'₹58,000',l:'BULK_CLAWBACK lockout',d:'Account closure blocked · deadlock',c:'#ea580c',id:'12414910'},
+    {a:'≈₹21,021',l:'Intl refund overdue',d:'USD 224.10 · ARN provided · TAT passed',c:'#ea580c',id:'12259136'},
+    {a:'₹6,221',l:'Fraud · no OTP',d:'TweetDeleter · RBI complaint threatened',c:'#dc2626',id:'12426275'},
+    {a:'₹98,999',l:'Txn blocked',d:'Security block · no self-serve unblock',c:'#dc2626',id:'12397980'},
+  ];
+  document.getElementById('hvc-list').innerHTML=cs.map(c=>`
+    <div class="hvc" style="border-left-color:${c.c};border-left:3px solid ${c.c}" onclick="openMod('${c.id}')">
+      <div class="hvamt" style="color:${c.c}">${c.a}</div>
+      <div><div style="font-size:11px;font-weight:600;color:var(--t1)">${c.l}</div>
+      <div style="font-size:9px;color:var(--t3)">${c.d}</div></div>
+    </div>`).join('');
+}
+
+function rOnb(){
+  const it=[
+    ["Stuck in 'Submitted' state",12,"#ea580c"],
+    ["Stuck in 'Reset' loop",4,"#ea580c"],
+    ["Approved — shows 'Setting up card'",2,"#dc2626"],
+    ["Employer not in onboarding dropdown",1,"#7c3aed"],
+    ["SBI account not fetching via AA",1,"#0284c7"],
+  ];
+  document.getElementById('onb-detail').innerHTML=
+    it.map(([l,n,c])=>`<div class="srow" onclick="setCF('Onboarding')"><span class="sk">${l}</span><span class="sv2" style="color:${c}">${n}</span></div>`).join('')+
+    `<div class="callout ca-o"><b>Longest: 103 days</b> — Feb 26 submission, zero communication, escalated Jun 8. 5 distinct failure modes across 20 tickets.</div>`;
+}
+
+// ── TRENDS ──
+function rVC(){
+  const data=gD();if(!data.length){document.getElementById('vchart').innerHTML='';return;}
+  const W=900,H=165,pt={t:14,r:8,b:30,l:26};
+  const mx=Math.max(...data.map(d=>d.v),1),xS=(W-pt.l-pt.r)/(data.length||1),yH=H-pt.t-pt.b;
+  const grids=[0,Math.ceil(mx/2),mx].map(v=>{const y=pt.t+(1-v/mx)*yH;
+    return`<line stroke="#f3f4f6" stroke-width="1" x1="${pt.l}" y1="${y.toFixed(1)}" x2="${W-pt.r}" y2="${y.toFixed(1)}"/>
+    <text class="ax" x="${pt.l-4}" y="${(y+3).toFixed(1)}" text-anchor="end">${v}</text>`;}).join('');
+  const step=Math.max(1,Math.floor(data.length/8));
+  const bars=data.map((d,i)=>{
+    const bW=Math.min(xS-3,28),x=pt.l+i*xS+(xS-bW)/2,barH=Math.max((d.v/mx)*yH,2),y=pt.t+yH-barH;
+    const hi=d.v>=8,sel=d.date===cD,col=sel?'#ea580c':hi?'#dc2626':'#2563eb',op=sel?1:hi?.85:.6;
+    const xl=i%step===0||i===data.length-1;
+    return`<g style="cursor:pointer" onclick="onBC('${d.date}','${d.d}')" onmouseenter="tip(event,'${d.d}: ${d.v} ticket${d.v!==1?'s':''}${hi?' — spike':''}')" onmouseleave="ht()">
+      <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bW.toFixed(1)}" height="${barH.toFixed(1)}" fill="${col}" opacity="${op}" rx="3"
+        onmouseover="this.style.opacity=1" onmouseout="this.style.opacity='${op}'"/>
+      ${hi||sel?`<text class="ax" x="${(x+bW/2).toFixed(1)}" y="${(y-4).toFixed(1)}" text-anchor="middle" fill="${col}" font-size="9" font-weight="700">${d.v}</text>`:''}
+      ${xl?`<text class="ax" x="${(x+bW/2).toFixed(1)}" y="${(pt.t+yH+15).toFixed(1)}" text-anchor="middle">${d.d}</text>`:''}
+    </g>`;}).join('');
+  document.getElementById('vchart').innerHTML=grids+bars;
+}
+
+function rDOW(){
+  const rws=[['Mon',18],['Tue',22],['Wed',19],['Thu',20],['Fri',17],['Sat',26],['Sun',26]];
+  document.getElementById('dow').innerHTML=rws.map(([d,v])=>
+    `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <span style="font-size:9px;color:var(--t2);width:22px;font-family:'JetBrains Mono',monospace">${d}</span>
+      <div style="flex:1;height:6px;background:var(--s2);border-radius:10px;overflow:hidden">
+        <div style="width:${v/26*100}%;height:100%;background:${v>=24?'#dc2626':'#2563eb'};border-radius:10px;transition:width .8s"></div>
+      </div>
+      <span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:${v>=24?'#dc2626':'#374151'};width:14px">${v}</span>
+    </div>`).join('')+
+    `<div class="callout ca-a"><b>Weekends peak</b> — users transact more Sat/Sun when CX staffing is typically lower. Consider weekend coverage SLA.</div>`;
+}
+
+function rWkly(){
+  const rws=[['Jun 6–12',33,'#7c3aed'],['Jun 13–19',38,'#dc2626'],['Jun 20–26',40,'#ea580c'],['Jun 27–30',26,'#059669']];
+  document.getElementById('wkly').innerHTML=rws.map(([w,v,c])=>
+    `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <span style="font-size:9px;color:var(--t2);width:68px">${w}</span>
+      <div style="flex:1;height:6px;background:var(--s2);border-radius:10px;overflow:hidden">
+        <div style="width:${v/40*100}%;height:100%;background:${c};border-radius:10px;transition:width .8s"></div>
+      </div>
+      <span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:${c};width:16px">${v}</span>
+    </div>`).join('')+
+    `<div class="callout ca-o"><b>Peak Wk3 (Jun 20–26)</b> — billing disputes, security blocks, and fraud all spiked together. Volume slightly down in Wk4 (partial week) but new OTP issue on Jun 30 changes trajectory.</div>`;
+}
+
+function rHmap(){
+  const cats=['Txn Block','Onboarding','Billing','Fraud','Monies','Refund','UPI','Repay','Payment','Chargeback'];
+  const wks=['W1','W2','W3','W4'];
+  const data=[[6,6,9,5],[2,4,6,6],[1,4,7,4],[0,1,2,2],[0,1,2,3],[0,3,4,3],[4,2,0,1],[0,3,1,0],[1,2,2,0],[0,0,1,2]];
+  const mx=Math.max(...data.flat(),1);
+  const colFn=v=>{if(!v)return'#f8fafc';const p=v/mx;return p>.6?'#fecaca':p>.3?'#fed7aa':'#bfdbfe';};
+  const txtFn=v=>{if(!v)return'#d1d5db';const p=v/mx;return p>.6?'#dc2626':p>.3?'#ea580c':'#2563eb';};
+  document.getElementById('hmap').innerHTML=
+    `<div style="display:flex;gap:2px;margin-bottom:5px;padding-left:64px">${wks.map(w=>`<div style="flex:1;text-align:center;font-size:9px;color:var(--t3);font-family:'JetBrains Mono',monospace">${w}</div>`).join('')}</div>`+
+    data.map((row,i)=>`<div style="display:flex;align-items:center;gap:2px;margin-bottom:2px">
+      <div style="width:62px;font-size:9px;color:var(--t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${cats[i]}</div>
+      ${row.map((v,j)=>`<div style="flex:1;height:16px;border-radius:4px;background:${colFn(v)};cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:${txtFn(v)}"
+        onmouseenter="tip(event,'${cats[i]} · ${wks[j]}: ${v} tickets')" onmouseleave="ht()">${v||''}</div>`).join('')}
+    </div>`).join('')+
+    `<div style="display:flex;gap:8px;margin-top:10px;font-size:9px;color:var(--t3)">${[['#f8fafc','#9ca3af','0'],['#bfdbfe','#2563eb','Low'],['#fed7aa','#ea580c','Med'],['#fecaca','#dc2626','High']].map(([bg,c,l])=>`<div style="display:flex;align-items:center;gap:3px"><div style="width:14px;height:10px;border-radius:3px;background:${bg};border:1px solid ${c}44"></div><span>${l}</span></div>`).join('')}</div>`;
+}
+
+// ── FEED ──
+function renderFeed(){
+  const q=(document.getElementById('fsr2')?.value||'').toLowerCase();
+  let it=gT().slice().sort((a,b)=>b.date.localeCompare(a.date));
+  if(aFC!=='all')it=it.filter(t=>t.cat===aFC);
+  if(q)it=it.filter(t=>t.title.toLowerCase().includes(q)||t.agent.toLowerCase().includes(q)||t.id.includes(q));
+  document.getElementById('fcount').textContent=it.length+' tickets · click for detail + Freshdesk';
+  if(!it.length){document.getElementById('flist').innerHTML='<div class="empty">No tickets match this filter</div>';return;}
+  document.getElementById('flist').innerHTML=it.map(t=>{
+    const c=CAT_COLOR[t.cat]||'#374151',init=t.agent.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const isNew=t.date==='2026-06-30';
+    return`<div class="fi2" onclick="openMod('${t.id}')">
+      <div class="fav" style="background:${c}">${init}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:2px">
+          <span class="fn">${t.agent}</span>
+          <span class="ft2">${t.date}</span>
+          <a class="fdl" href="https://slice.freshdesk.com/a/tickets/${t.id}" target="_blank" onclick="event.stopPropagation()">↗ #${t.id}</a>
+          ${ctH(t.cat)}${tH(t.sev)}
+          ${t.amt?`<span style="font-size:9px;color:var(--yel);font-family:'JetBrains Mono',monospace;font-weight:600">${fmt(t.amt)}</span>`:''}
+          ${isNew?`<span style="font-size:9px;font-weight:700;color:#dc2626;background:#fef2f2;border:1px solid #fecaca;padding:1px 5px;border-radius:4px">NEW</span>`:''}
+        </div>
+        <div class="ftxt">${t.title}</div>
+      </div>
+      <span style="font-size:11px;color:var(--t3);align-self:center;flex-shrink:0">›</span>
+    </div>`;}).join('');
+}
+
+// ── ACTIONS ──
+function rRecs(){
+  const rc=[
+    {p:'P0',c:'#dc2626',ico:'🚨',t:'IMMEDIATE: Fix OTP delivery failure for CC online transactions',b:'Jun 30: Multiple CC users not receiving OTP for online transactions. All CC online purchases are failing. This is a revenue and trust emergency. Trigger war-room response, escalate to infra/payment team immediately. ETA for fix: within 4 hours.'},
+    {p:'P1',c:'#dc2626',ico:'🔓',t:'In-App Transaction Unblock Flow',b:'26 tickets/month requiring manual CX. Build "Why was I blocked?" → guided identity check → instant unblock for low-risk customers. Estimated deflection: ~20/month. Impact: reduces CX load, improves activation.'},
+    {p:'P1',c:'#dc2626',ico:'⚖️',t:'RBI Escalation Fast-Track Protocol',b:'3 flags this week. Dedicated queue, 4-hr SLA, compliance owner, documentation trail. Each materialised RBI complaint triggers ₹1L–₹5L operational cost + reputation damage.'},
+    {p:'P1',c:'#dc2626',ico:'💸',t:'Repayment Reconciliation Job',b:'₹1,49,248 unreconciled. Daily bank-debit ↔ CC-credit match job. Auto-flag mismatches within 2 hrs. Resolve proactively — no user escalation should be needed for this.'},
+    {p:'P2',c:'#ea580c',ico:'📋',t:'Onboarding State Machine Overhaul',b:'18 stuck users, 5 distinct failure modes, 103-day worst case, Army employer missing from list. Need: SMS/push at 48hrs, escalate at 7 days, deep-linked status page, AA fallback for SBI, expanded employer database.'},
+    {p:'P2',c:'#ea580c',ico:'🔗',t:'UPI Linking Watchdog',b:'8 cases Jun 6–16 resolved, 1 new Jun 30. 2-hr watchdog: auto-retry, push notification, PagerDuty at >5 concurrent failures/hour. Prevent silent infra bugs from becoming user escalations.'},
+    {p:'P2',c:'#ea580c',ico:'🧾',t:'Billing Engine Audit + Transparency Layer',b:'7 distinct billing failure modes: IGST, surcharge on microtransaction (₹11.80>₹10.23), BULK_CLAWBACK, interest errors, autopay drift, surcharge not reversed on refund. Requires billing engine audit. Also add tap-to-explain on every charge.'},
+    {p:'P3',c:'#059669',ico:'📣',t:'Social Media CX Queue',b:'2 active Twitter handles (@_Mynkkkk_, @dhruv__goyal). Dedicated 2-hr response SLA. Each public reply shows thousands of observers that Slice is responsive. No current SLA = compounding negative signal.'},
+    {p:'P3',c:'#059669',ico:'📦',t:'Refund Tracker with Push Notifications',b:'10+ refund escalations with TAT breached. Surface ARN, merchant timeline, chargeback status in-app. Auto-push at every processing stage — eliminates most refund "where is my money?" tickets.'},
+  ];
+  document.getElementById('recs').innerHTML=rc.map((r,i)=>`
+    <div class="rec" style="border-left-color:${r.c}" onclick="tgR(${i})">
+      <span style="font-size:16px;flex-shrink:0;line-height:1.2;padding-top:1px">${r.ico}</span>
+      <div style="flex:1">
+        <div class="rtitle">
+          <span class="tag" style="background:${r.c}18;color:${r.c};border:1px solid ${r.c}30;font-size:9px">${r.p}</span>
+          ${r.t}
+          <span style="margin-left:auto;font-size:10px;color:var(--t3)" id="rc-${i}">▼</span>
+        </div>
+        <div class="rbody" id="rb-${i}">${r.b}</div>
+      </div>
+    </div>`).join('');
+}
+function tgR(i){const b=document.getElementById('rb-'+i),c=document.getElementById('rc-'+i);const o=b.classList.toggle('open');if(c)c.textContent=o?'▲':'▼';}
+
+function rUXW(){
+  const ws=[
+    ['💡','BULK_CLAWBACK inline explanation','One tooltip: what it means, why, what to do. Currently 5 tickets with zero self-serve path.'],
+    ['📍','Real-time onboarding status page','Stage, ETA, history. Eliminates "what\'s happening to my card?" entirely.'],
+    ['🔔','Autopay debit notification 48hr prior','Push + SMS before firing. Prevents confusion from date variations.'],
+    ['🏢','Expand employer database','Army and other PSUs missing. Blocks salaried profile onboarding for govt employees.'],
+    ['📊','Interest breakdown widget','Rate × days × principal formula inline on statement. Cuts interest dispute tickets.'],
+    ['🔢','PIN generation surface fix','"Change PIN" missing. Nav regression — one-sprint fix, high user impact.'],
+  ];
+  document.getElementById('uxw').innerHTML=ws.map(([ico,t,b])=>`
+    <div class="uxw"><span style="font-size:14px;flex-shrink:0">${ico}</span>
+    <div><div style="font-size:10px;font-weight:600;color:var(--t1);margin-bottom:2px">${t}</div>
+    <div style="font-size:9px;color:var(--t2);line-height:1.5">${b}</div></div></div>`).join('');
+}
+
+// ── MODAL ──
+function openMod(id){
+  const t=TK.find(x=>x.id===id);if(!t)return;
+  document.getElementById('mtitle').textContent=t.title;
+  document.getElementById('mbody').innerHTML=`
+    <div><div style="display:flex;gap:5px;flex-wrap:wrap">${ctH(t.cat)}${tH(t.sev)}${t.amt?`<span class="tag" style="background:var(--yell);color:var(--yel);border:1px solid var(--yelt)">${fmt(t.amt)}</span>`:''}</div></div>
+    <div><label class="mfl2">Issue Detail</label><div class="mfv">${t.detail}</div></div>
+    <div><label class="mfl2">Ticket Info</label>
+      <div class="mgrid">
+        <div class="mgi"><div class="mgl">Raised by</div><div class="mgv">${t.agent}</div></div>
+        <div class="mgi"><div class="mgl">Date</div><div class="mgv">${t.date}</div></div>
+        <div class="mgi"><div class="mgl">Category</div><div class="mgv">${t.cat}</div></div>
+        <div class="mgi"><div class="mgl">Severity</div><div class="mgv">${SM[t.sev]?.l||t.sev}</div></div>
+      </div>
+    </div>
+    <div><label class="mfl2">Open in Freshdesk</label>
+      <a class="fdbtn" href="https://slice.freshdesk.com/a/tickets/${t.id}" target="_blank">↗ Ticket #${t.id}</a>
+    </div>`;
+  document.getElementById('mbal').classList.add('open');
+}
+function closeMod(){document.getElementById('mbal').classList.remove('open');}
+function onMB(e){if(e.target===document.getElementById('mbal'))closeMod();}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMod();});
+
+// ── FILTERS ──
+function setSev(v){aS=v;['all','critical','high','medium'].forEach(x=>{const b=document.getElementById('sf-'+x);if(b)b.classList.toggle('on',x===v);});renderIT();}
+function setCF(cat){
+  aC=cat;const btn=document.getElementById('ccf');
+  if(btn){btn.textContent='✕ '+cat;btn.style.display=cat==='all'?'none':'inline-flex';}
+  sw('issues');renderIT();
+}
+function clrCat(){setCF('all');}
+function setFC(v){
+  aFC=v;
+  const map={all:'all',txn:'Txn Blocked',onb:'Onboarding',bil:'Billing',ref:'Refund',fra:'Fraud'};
+  Object.entries(map).forEach(([k,val])=>{const b=document.getElementById('ff-'+k);if(b)b.classList.toggle('on',val===v);});
+  renderFeed();
+}
+function onBC(date,label){
+  if(cD===date){clrCF();return;}
+  cD=date;document.getElementById('cfb').style.display='flex';document.getElementById('cfl').textContent='Filtered: '+label;
+  rVC();sw('issues');renderIT();
+}
+function clrCF(){cD=null;document.getElementById('cfb').style.display='none';rVC();renderIT();}
+
+// ── TABS ──
+function sw(id){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('pane-'+id).classList.add('on');
+  document.getElementById('tab-'+id).classList.add('on');
+}
+
+// ── EXPORT ──
+function exportCSV(){
+  const t=gT();
+  const rows=[['#','Ticket','Title','Category','Severity','Agent','Date','Amount'],
+    ...t.map((r,i)=>[i+1,r.id,`"${r.title}"`,r.cat,r.sev,`"${r.agent}"`,r.date,r.amt||''])];
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'}));
+  a.download='cx_tickets_slice.csv';a.click();
+}
+
+// ── LIVE REFRESH ──
+// How it works: Refresh button calls sendPrompt() which sends a message to Claude
+// in this chat. Claude fetches Slack server-side, then posts back via postMessage.
+// The dashboard listens for that message and merges new tickets in.
+
+const CHANNEL_ID = 'C094T6L0RLK';
+let isRefreshing = false;
+let refreshCountdownIv = null;
+
+function showToast(msg, type, dur) {
+  type = type || 'info'; dur = dur || 3500;
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'refresh-toast toast-' + type;
+  el.style.display = 'block';
+  clearTimeout(el._t);
+  el._t = setTimeout(function(){ el.style.display = 'none'; }, dur);
+}
+
+function setRefreshState(loading) {
+  isRefreshing = loading;
+  var btn = document.getElementById('refresh-btn');
+  var ico = document.getElementById('refresh-icon');
+  if (!btn) return;
+  btn.disabled = loading;
+  ico.className = loading ? 'spin' : '';
+  ico.textContent = '↻';
+}
+
+function updateLastRefreshed() {
+  var el = document.getElementById('last-refresh-lbl');
+  if (el) el.textContent = 'Refreshed ' + new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+}
+
+function startCountdown(secs) {
+  secs = secs || 300;
+  if (refreshCountdownIv) clearInterval(refreshCountdownIv);
+  var remaining = secs;
+  refreshCountdownIv = setInterval(function() {
+    remaining--;
+    if (remaining <= 0) { clearInterval(refreshCountdownIv); return; }
+    var el = document.getElementById('last-refresh-lbl');
+    if (el && !isRefreshing) {
+      var m = Math.floor(remaining / 60), s = remaining % 60;
+      el.textContent = 'Next refresh in ' + m + ':' + (s < 10 ? '0' : '') + s;
+    }
+  }, 1000);
+}
+
+function mergeTickets(freshTickets) {
+  if (!freshTickets || !freshTickets.length) return 0;
+  var added = 0;
+  freshTickets.forEach(function(ft) {
+    if (!ft.id || !ft.date || !ft.title) return;
+    var exists = TK.find(function(t){ return t.id === String(ft.id); });
+    if (!exists) {
+      ft.id = String(ft.id);
+      TK.unshift(ft);
+      added++;
+    }
+  });
+  TK.sort(function(a, b){ return b.date.localeCompare(a.date); });
+  return added;
+}
+
+// Listen for Claude's postMessage response with fresh ticket data
+window.addEventListener('message', function(event) {
+  if (!event.data || event.data.type !== 'cx_slack_refresh') return;
+  try {
+    var fresh = event.data.tickets;
+    var added = mergeTickets(fresh);
+    if (added === 0) {
+      showToast('✓ Already up to date', 'ok');
+    } else {
+      showToast('✅ ' + added + ' new ticket' + (added !== 1 ? 's' : '') + ' added', 'ok', 5000);
+      var badge = document.querySelector('.new-badge');
+      if (badge) badge.textContent = '🟢 +' + added + ' new';
+    }
+    updateLastRefreshed();
+    setRefreshState(false);
+    rafAll(); rAlerts(); rSpark(); rHVC(); rOnb();
+    rInsKPIs(); rCatTrend(); rTrendTable(); rPatterns(); rResRisk(); rRBIRisk(); rViralRisk();
+    startCountdown(300);
+  } catch(e) {
+    console.error('postMessage parse error:', e);
+    setRefreshState(false);
+    showToast('⚠️ Could not apply refresh data', 'err');
+  }
+});
+
+function doRefresh() {
+  if (isRefreshing) return;
+  setRefreshState(true);
+  showToast('🔄 Asking Claude to fetch latest from #cc-launch-cx…', 'info', 12000);
+  // sendPrompt sends a message into the Claude chat — Claude fetches Slack
+  // server-side and replies with postMessage containing the ticket JSON
+  try {
+    sendPrompt('DASHBOARD_REFRESH: Please fetch the latest messages from Slack channel #cc-launch-cx (C094T6L0RLK) and call window.postMessage({type:"cx_slack_refresh", tickets: [...]}, "*") with the parsed ticket array. Use the same ticket schema as the dashboard (id, date, agent, cat, sev, title, amt, detail).');
+    // Timeout fallback — if no response in 30s, stop spinner
+    setTimeout(function() {
+      if (isRefreshing) {
+        setRefreshState(false);
+        showToast('⏱ Refresh timed out — try again', 'err');
+      }
+    }, 30000);
+  } catch(e) {
+    // sendPrompt not available outside Claude artifact environment
+    setRefreshState(false);
+    showToast('ℹ️ Refresh only works inside Claude.ai', 'info', 6000);
+  }
+}
+
+// ── INIT ──
+window.addEventListener('DOMContentLoaded', function() {
+  rafAll(); rAlerts(); rSpark(); rHVC(); rOnb(); rRecs(); rUXW(); rDOW(); rWkly(); rHmap();
+  rInsKPIs(); rCatTrend(); rTrendTable(); rPatterns(); rResRisk(); rRBIRisk(); rViralRisk();
+  updateLastRefreshed();
+  startCountdown(300);
+});
+</script>
+</body>
+</html>
